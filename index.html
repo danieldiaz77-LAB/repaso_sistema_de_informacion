@@ -3093,6 +3093,813 @@
                                 <li>Notificaciones automáticas</li>
                             </ul>
                         </div>
+
+                        
+                    </div>
+                </div>
+            </div>   <!-- PREGUNTA 2 DE PEP 2 -->
+                <div class="pep-section" style="margin-top: 40px;">
+                    <h3>🏥 PREGUNTA 2: Sistema de Agendamiento de Citas en Clínica (40%)</h3>
+                    
+                    <div class="solucion">
+                        <h4>📋 Enunciado</h4>
+                        <p>Una clínica desea desarrollar un sistema de agendamiento de citas con las siguientes reglas:</p>
+                        
+                        <div class="card">
+                            <h4>📌 Reglas de Negocio</h4>
+                            <ul>
+                                <li>🏥 <strong>Registro base:</strong> Especialidades, boxes y profesionales asociados</li>
+                                <li>📅 <strong>Calendario y horario:</strong> Definir calendario y horario de atención de la clínica</li>
+                                <li>👨‍⚕️ <strong>Bloques horarios:</strong> Cada profesional define sus bloques de atención y duración por especialidad</li>
+                                <li>📆 <strong>Agenda mensual:</strong> Se confecciona agenda mensual disponible para agendamiento</li>
+                                <li>👤 <strong>Agendamiento:</strong> Pacientes se registran y pueden consultar por especialidad, profesional u horario</li>
+                                <li>🔒 <strong>Bloqueo de horario:</strong> Al agendar, el sistema marca y bloquea el horario</li>
+                                <li>📞 <strong>Confirmación 24h antes:</strong> Contact center confirma o desbloquea si desiste</li>
+                                <li>✅ <strong>Arribo del paciente:</strong> Ejecutivo marca "paciente arribado" e informa box</li>
+                                <li>🚪 <strong>Estados de atención:</strong> Se marca "paciente ingresado" y "paciente atendido"</li>
+                                <li>📊 <strong>Estadísticas:</strong> Generación mensual de tiempos de espera y atención</li>
+                            </ul>
+                        </div>
+
+                        <h4 style="margin-top: 30px;">✅ SOLUCIÓN a) DFD del Sistema de Agendamiento</h4>
+
+                        <div class="card">
+                            <h4>🔵 ENTIDADES EXTERNAS</h4>
+                            <ul>
+                                <li><strong>🏥 Administración Clínica:</strong> Define especialidades, boxes, horarios</li>
+                                <li><strong>👨‍⚕️ Profesional Médico:</strong> Define sus bloques de atención</li>
+                                <li><strong>👤 Paciente:</strong> Solicita y consulta citas</li>
+                                <li><strong>📞 Contact Center:</strong> Confirma citas antes de 24h</li>
+                                <li><strong>👔 Ejecutivo de Atención:</strong> Registra arribo, ingreso y egreso</li>
+                            </ul>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <h4>⚙️ PROCESOS PRINCIPALES</h4>
+                            
+                            <div class="box" style="border-left: 5px solid #e74c3c;">
+                                <h4>P1. CONFIGURAR ESTRUCTURA BASE</h4>
+                                <p><strong>Entrada:</strong> Especialidades, boxes, profesionales, asociaciones</p>
+                                <p><strong>Salida:</strong> Estructura base configurada</p>
+                                <p><strong>Almacena en:</strong> D1-Especialidades, D2-Boxes, D3-Profesionales</p>
+                                <p><strong>Descripción:</strong> Permite a la administración:
+                                    <ul>
+                                        <li>Registrar especialidades médicas (cardiología, pediatría, etc.)</li>
+                                        <li>Registrar boxes de atención con su ubicación</li>
+                                        <li>Registrar profesionales con sus datos</li>
+                                        <li>Asociar profesionales a especialidades</li>
+                                        <li>Asociar profesionales a boxes</li>
+                                    </ul>
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #3498db;">
+                                <h4>P2. DEFINIR CALENDARIO Y HORARIOS DE CLÍNICA</h4>
+                                <p><strong>Entrada:</strong> Horarios de atención, días hábiles, feriados</p>
+                                <p><strong>Salida:</strong> Calendario base de la clínica</p>
+                                <p><strong>Almacena en:</strong> D4-Calendario Clínica</p>
+                                <p><strong>Descripción:</strong> Define el calendario general de la clínica:
+                                    <ul>
+                                        <li>Días de atención (lun-vie, lun-sab, etc.)</li>
+                                        <li>Horarios de apertura/cierre</li>
+                                        <li>Días feriados y cierres especiales</li>
+                                        <li>Horarios diferenciados por día (ej: sábado medio día)</li>
+                                    </ul>
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #27ae60;">
+                                <h4>P3. DEFINIR BLOQUES HORARIOS DE PROFESIONALES</h4>
+                                <p><strong>Entrada:</strong> Disponibilidad del profesional, duración de atención</p>
+                                <p><strong>Salida:</strong> Bloques horarios configurados</p>
+                                <p><strong>Almacena en:</strong> D5-Bloques Profesionales</p>
+                                <p><strong>Descripción:</strong> Cada profesional define:
+                                    <ul>
+                                        <li>Días y horarios en que atiende</li>
+                                        <li>Duración de cada atención según especialidad (ej: 20 min, 30 min)</li>
+                                        <li>Box donde atiende</li>
+                                        <li>Bloqueos por ausencias (vacaciones, licencias)</li>
+                                    </ul>
+                                    <strong>Ejemplo:</strong> Dr. Pérez (Cardiólogo) atiende lunes 9:00-13:00 en Box 3, cada consulta dura 30 min.
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #f39c12;">
+                                <h4>P4. GENERAR AGENDA MENSUAL</h4>
+                                <p><strong>Entrada:</strong> Calendario clínica, bloques profesionales</p>
+                                <p><strong>Salida:</strong> Agenda mensual con slots disponibles</p>
+                                <p><strong>Consulta:</strong> D4-Calendario Clínica, D5-Bloques Profesionales</p>
+                                <p><strong>Almacena en:</strong> D6-Agenda Mensual</p>
+                                <p><strong>Descripción:</strong> Proceso batch (mensual) que genera todos los slots de atención disponibles:
+                                    <ul>
+                                        <li>Cruza calendario de clínica con bloques de profesionales</li>
+                                        <li>Genera slots de tiempo específicos (ej: 09:00, 09:30, 10:00...)</li>
+                                        <li>Marca cada slot como DISPONIBLE</li>
+                                        <li>Asocia cada slot a: profesional, especialidad, box, fecha, hora</li>
+                                    </ul>
+                                    Este proceso se ejecuta al inicio de cada mes.
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #9b59b6;">
+                                <h4>P5. REGISTRAR PACIENTE</h4>
+                                <p><strong>Entrada:</strong> Datos del paciente (nombre, RUT, contacto)</p>
+                                <p><strong>Salida:</strong> Paciente registrado con ID</p>
+                                <p><strong>Almacena en:</strong> D7-Pacientes</p>
+                                <p><strong>Descripción:</strong> Si el paciente es nuevo, se registran sus datos:
+                                    <ul>
+                                        <li>Datos personales (nombre, RUT, fecha nacimiento)</li>
+                                        <li>Datos de contacto (teléfono, email)</li>
+                                        <li>Previsión (Isapre, Fonasa)</li>
+                                    </ul>
+                                    Si ya existe, se valida su identidad.
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #e67e22;">
+                                <h4>P6. CONSULTAR Y AGENDAR CITA</h4>
+                                <p><strong>Entrada:</strong> Criterios de búsqueda (especialidad, profesional, fecha)</p>
+                                <p><strong>Salida:</strong> Cita agendada, slot bloqueado</p>
+                                <p><strong>Consulta:</strong> D6-Agenda Mensual</p>
+                                <p><strong>Almacena en:</strong> D8-Citas</p>
+                                <p><strong>Descripción:</strong> El paciente puede buscar disponibilidad por:
+                                    <ul>
+                                        <li>Especialidad (muestra todos los profesionales de esa especialidad)</li>
+                                        <li>Profesional específico</li>
+                                        <li>Rango de horarios preferidos</li>
+                                    </ul>
+                                    Al agendar:
+                                    <ul>
+                                        <li>Se crea un registro de CITA en D8</li>
+                                        <li>Se marca el slot en D6 como BLOQUEADO</li>
+                                        <li>Se asigna estado: AGENDADA</li>
+                                        <li>Se envía confirmación al paciente</li>
+                                    </ul>
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #16a085;">
+                                <h4>P7. CONFIRMAR CITAS (24H ANTES)</h4>
+                                <p><strong>Entrada:</strong> Citas agendadas para el día siguiente</p>
+                                <p><strong>Salida:</strong> Cita confirmada o cancelada</p>
+                                <p><strong>Actualiza:</strong> D8-Citas, D6-Agenda Mensual</p>
+                                <p><strong>Descripción:</strong> Proceso batch que se ejecuta diariamente:
+                                    <ul>
+                                        <li>Identifica citas para el día siguiente</li>
+                                        <li>Contact center llama al paciente</li>
+                                        <li><strong>Si confirma:</strong> Estado → CONFIRMADA</li>
+                                        <li><strong>Si desiste:</strong> 
+                                            <ul>
+                                                <li>Estado → CANCELADA</li>
+                                                <li>Slot en agenda → DISPONIBLE</li>
+                                                <li>Puede ser agendado por otro paciente</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #c0392b;">
+                                <h4>P8. REGISTRAR ARRIBO DEL PACIENTE</h4>
+                                <p><strong>Entrada:</strong> Llegada del paciente a recepción</p>
+                                <p><strong>Salida:</strong> Estado actualizado, box informado</p>
+                                <p><strong>Actualiza:</strong> D8-Citas</p>
+                                <p><strong>Descripción:</strong> Cuando el paciente llega:
+                                    <ul>
+                                        <li>Ejecutivo verifica la cita en el sistema</li>
+                                        <li>Marca estado → ARRIBADO</li>
+                                        <li>Registra hora real de arribo</li>
+                                        <li>Informa al paciente el box asignado</li>
+                                        <li>Puede generar alerta si llegó tarde o muy temprano</li>
+                                    </ul>
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #d35400;">
+                                <h4>P9. REGISTRAR INGRESO Y EGRESO DE ATENCIÓN</h4>
+                                <p><strong>Entrada:</strong> Eventos desde box de atención</p>
+                                <p><strong>Salida:</strong> Estados de atención actualizados</p>
+                                <p><strong>Actualiza:</strong> D8-Citas</p>
+                                <p><strong>Descripción:</strong> Control del flujo de atención:
+                                    <ul>
+                                        <li><strong>Paciente ingresa a box:</strong>
+                                            <ul>
+                                                <li>Ejecutivo marca → INGRESADO</li>
+                                                <li>Registra hora de ingreso</li>
+                                            </ul>
+                                        </li>
+                                        <li><strong>Paciente sale del box:</strong>
+                                            <ul>
+                                                <li>Ejecutivo marca → ATENDIDO</li>
+                                                <li>Registra hora de egreso</li>
+                                                <li>Cita finalizada</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </p>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #8e44ad;">
+                                <h4>P10. GENERAR ESTADÍSTICAS MENSUALES</h4>
+                                <p><strong>Entrada:</strong> Historial de citas del mes</p>
+                                <p><strong>Salida:</strong> Reportes de KPIs y estadísticas</p>
+                                <p><strong>Consulta:</strong> D8-Citas (historial)</p>
+                                <p><strong>Almacena en:</strong> D9-Estadísticas</p>
+                                <p><strong>Descripción:</strong> Proceso batch mensual que calcula:
+                                    <ul>
+                                        <li><strong>Tiempo de espera:</strong> Tiempo entre arribo e ingreso al box</li>
+                                        <li><strong>Tiempo de atención:</strong> Tiempo entre ingreso y egreso</li>
+                                        <li><strong>KPIs por box:</strong> Promedio de tiempos, cantidad de atenciones</li>
+                                        <li><strong>KPIs por profesional:</strong> Cumplimiento de horarios, duración real vs planificada</li>
+                                        <li><strong>KPIs por especialidad:</strong> Demanda, tiempos promedio</li>
+                                        <li><strong>Tasa de ausentismo:</strong> % de citas no confirmadas o no asistidas</li>
+                                    </ul>
+                                    Estos datos retroalimentan la generación de agenda del mes siguiente.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <h4>💾 REPOSITORIOS</h4>
+                            <ul>
+                                <li><strong>D1-Especialidades:</strong> Catálogo de especialidades médicas</li>
+                                <li><strong>D2-Boxes:</strong> Boxes de atención con ubicación</li>
+                                <li><strong>D3-Profesionales:</strong> Médicos con especialidades asociadas</li>
+                                <li><strong>D4-Calendario Clínica:</strong> Horarios y días de atención general</li>
+                                <li><strong>D5-Bloques Profesionales:</strong> Disponibilidad y duración por profesional</li>
+                                <li><strong>D6-Agenda Mensual:</strong> Slots de atención disponibles (estado: DISPONIBLE/BLOQUEADO)</li>
+                                <li><strong>D7-Pacientes:</strong> Registro de pacientes</li>
+                                <li><strong>D8-Citas:</strong> Citas agendadas con todos sus estados y tiempos</li>
+                                <li><strong>D9-Estadísticas:</strong> KPIs mensuales para optimización</li>
+                            </ul>
+                        </div>
+
+                        <h4 style="margin-top: 30px;">✅ SOLUCIÓN b) Modelo de Datos para el Sistema de Agenda</h4>
+
+                        <div class="card">
+                            <h4>🗄️ MODELO ENTIDAD-RELACIÓN</h4>
+                            
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                                <h4 style="color: #2c3e50;">Entidades Principales</h4>
+                                
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>📋 ESPECIALIDAD</h4>
+                                    <ul>
+                                        <li><strong>id_especialidad</strong> (PK)</li>
+                                        <li>nombre (ej: "Cardiología")</li>
+                                        <li>descripcion</li>
+                                        <li>activo (boolean)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>🏥 BOX</h4>
+                                    <ul>
+                                        <li><strong>id_box</strong> (PK)</li>
+                                        <li>numero_box</li>
+                                        <li>ubicacion (piso, ala)</li>
+                                        <li>equipamiento</li>
+                                        <li>activo (boolean)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>👨‍⚕️ PROFESIONAL</h4>
+                                    <ul>
+                                        <li><strong>id_profesional</strong> (PK)</li>
+                                        <li>rut</li>
+                                        <li>nombre</li>
+                                        <li>apellidos</li>
+                                        <li>email</li>
+                                        <li>telefono</li>
+                                        <li>activo (boolean)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>🔗 PROFESIONAL_ESPECIALIDAD (Tabla de relación N:M)</h4>
+                                    <ul>
+                                        <li><strong>id_profesional</strong> (FK)</li>
+                                        <li><strong>id_especialidad</strong> (FK)</li>
+                                        <li>duracion_atencion_minutos</li>
+                                        <li>PRIMARY KEY (id_profesional, id_especialidad)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>⏰ BLOQUE_HORARIO</h4>
+                                    <ul>
+                                        <li><strong>id_bloque</strong> (PK)</li>
+                                        <li>id_profesional (FK)</li>
+                                        <li>id_especialidad (FK)</li>
+                                        <li>id_box (FK)</li>
+                                        <li>dia_semana (1=Lunes, 7=Domingo)</li>
+                                        <li>hora_inicio (TIME)</li>
+                                        <li>hora_fin (TIME)</li>
+                                        <li>fecha_inicio_vigencia</li>
+                                        <li>fecha_fin_vigencia</li>
+                                        <li>activo (boolean)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>📅 SLOT_AGENDA</h4>
+                                    <ul>
+                                        <li><strong>id_slot</strong> (PK)</li>
+                                        <li>id_profesional (FK)</li>
+                                        <li>id_especialidad (FK)</li>
+                                        <li>id_box (FK)</li>
+                                        <li>fecha (DATE)</li>
+                                        <li>hora_inicio (TIME)</li>
+                                        <li>hora_fin (TIME)</li>
+                                        <li>estado (ENUM: 'DISPONIBLE', 'BLOQUEADO', 'NO_DISPONIBLE')</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>👤 PACIENTE</h4>
+                                    <ul>
+                                        <li><strong>id_paciente</strong> (PK)</li>
+                                        <li>rut</li>
+                                        <li>nombre</li>
+                                        <li>apellidos</li>
+                                        <li>fecha_nacimiento</li>
+                                        <li>email</li>
+                                        <li>telefono</li>
+                                        <li>prevision (ENUM: 'ISAPRE', 'FONASA', 'PARTICULAR')</li>
+                                        <li>nombre_isapre</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>📝 CITA</h4>
+                                    <ul>
+                                        <li><strong>id_cita</strong> (PK)</li>
+                                        <li>id_slot (FK)</li>
+                                        <li>id_paciente (FK)</li>
+                                        <li>fecha_agendamiento (TIMESTAMP)</li>
+                                        <li>estado (ENUM: 'AGENDADA', 'CONFIRMADA', 'CANCELADA', 'ARRIBADO', 'INGRESADO', 'ATENDIDO', 'NO_ASISTIO')</li>
+                                        <li>fecha_hora_arribo (TIMESTAMP)</li>
+                                        <li>fecha_hora_ingreso (TIMESTAMP)</li>
+                                        <li>fecha_hora_egreso (TIMESTAMP)</li>
+                                        <li>observaciones (TEXT)</li>
+                                        <li>usuario_confirma</li>
+                                        <li>usuario_registra_arribo</li>
+                                    </ul>
+                                </div>
+
+                                <div class="box" style="margin-top: 15px; background: white;">
+                                    <h4>📊 ESTADISTICA_MENSUAL</h4>
+                                    <ul>
+                                        <li><strong>id_estadistica</strong> (PK)</li>
+                                        <li>mes</li>
+                                        <li>anio</li>
+                                        <li>id_profesional (FK, nullable)</li>
+                                        <li>id_especialidad (FK, nullable)</li>
+                                        <li>id_box (FK, nullable)</li>
+                                        <li>total_citas</li>
+                                        <li>citas_atendidas</li>
+                                        <li>citas_no_asistio</li>
+                                        <li>tiempo_espera_promedio_minutos</li>
+                                        <li>tiempo_atencion_promedio_minutos</li>
+                                        <li>tasa_ausentismo_porcentaje</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196f3;">
+                                <h4>🔗 Relaciones Principales</h4>
+                                <ul>
+                                    <li>PROFESIONAL ←→ ESPECIALIDAD (N:M) a través de PROFESIONAL_ESPECIALIDAD</li>
+                                    <li>BLOQUE_HORARIO → PROFESIONAL (N:1)</li>
+                                    <li>BLOQUE_HORARIO → ESPECIALIDAD (N:1)</li>
+                                    <li>BLOQUE_HORARIO → BOX (N:1)</li>
+                                    <li>SLOT_AGENDA → PROFESIONAL (N:1)</li>
+                                    <li>SLOT_AGENDA → ESPECIALIDAD (N:1)</li>
+                                    <li>SLOT_AGENDA → BOX (N:1)</li>
+                                    <li>CITA → SLOT_AGENDA (N:1)</li>
+                                    <li>CITA → PACIENTE (N:1)</li>
+                                    <li>ESTADISTICA_MENSUAL → PROFESIONAL (N:1, opcional)</li>
+                                    <li>ESTADISTICA_MENSUAL → ESPECIALIDAD (N:1, opcional)</li>
+                                    <li>ESTADISTICA_MENSUAL → BOX (N:1, opcional)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h4 style="margin-top: 30px;">✅ SOLUCIÓN c) ¿Qué debería realizar el ETL para generar estadísticas?</h4>
+
+                        <div class="important">
+                            <h4>📊 Proceso ETL para Estadísticas Mensuales</h4>
+                            
+                            <div class="box" style="margin-top: 15px;">
+                                <h4>1️⃣ EXTRACT (Extracción)</h4>
+                                <p><strong>Fuente de datos:</strong> Tabla CITA (datos transaccionales)</p>
+                                <p><strong>Filtros:</strong></p>
+                                <ul>
+                                    <li>Seleccionar citas del mes a procesar</li>
+                                    <li>Incluir solo citas en estados finales: ATENDIDO, NO_ASISTIO, CANCELADA</li>
+                                    <li>Excluir citas AGENDADAS o CONFIRMADAS que aún no ocurren</li>
+                                </ul>
+                                <p><strong>Datos a extraer:</strong></p>
+                                <ul>
+                                    <li>id_cita, id_slot, id_paciente, estado</li>
+                                    <li>fecha_hora_arribo, fecha_hora_ingreso, fecha_hora_egreso</li>
+                                </ul>
+                                <p><strong>Joins necesarios:</strong></p>
+                                <ul>
+                                    <li>CITA → SLOT_AGENDA (para obtener profesional, especialidad, box)</li>
+                                    <li>SLOT_AGENDA → PROFESIONAL</li>
+                                    <li>SLOT_AGENDA → ESPECIALIDAD</li>
+                                    <li>SLOT_AGENDA → BOX</li>
+                                </ul>
+                            </div>
+
+                            <div class="box" style="margin-top: 15px;">
+                                <h4>2️⃣ TRANSFORM (Transformación)</h4>
+                                <p><strong>Cálculos a realizar:</strong></p>
+                                
+                                <p style="margin-top: 10px;"><strong>A) Tiempos de Espera:</strong></p>
+                                <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto;">
+tiempo_espera = fecha_hora_ingreso - fecha_hora_arribo
+-- Convertir a minutos
+tiempo_espera_minutos = TIMESTAMPDIFF(MINUTE, fecha_hora_arribo, fecha_hora_ingreso)</pre>
+
+                                <p style="margin-top: 10px;"><strong>B) Tiempos de Atención:</strong></p>
+                                <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto;">
+tiempo_atencion = fecha_hora_egreso - fecha_hora_ingreso
+-- Convertir a minutos
+tiempo_atencion_minutos = TIMESTAMPDIFF(MINUTE, fecha_hora_ingreso, fecha_hora_egreso)</pre>
+
+                                <p style="margin-top: 10px;"><strong>C) Agregaciones por Box:</strong></p>
+                                <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto;">
+SELECT 
+    id_box,
+    COUNT(*) as total_citas,
+    COUNT(CASE WHEN estado = 'ATENDIDO' THEN 1 END) as citas_atendidas,
+    COUNT(CASE WHEN estado = 'NO_ASISTIO' THEN 1 END) as citas_no_asistio,
+    AVG(tiempo_espera_minutos) as tiempo_espera_promedio,
+    AVG(tiempo_atencion_minutos) as tiempo_atencion_promedio
+FROM citas_con_tiempos
+GROUP BY id_box</pre>
+
+                                <p style="margin-top: 10px;"><strong>D) Agregaciones por Profesional:</strong></p>
+                                <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto;">
+SELECT 
+    id_profesional,
+    COUNT(*) as total_citas,
+    AVG(tiempo_atencion_minutos) as tiempo_atencion_promedio,
+    (COUNT(CASE WHEN estado = 'NO_ASISTIO' THEN 1 END) * 100.0 / COUNT(*)) as tasa_ausentismo
+FROM citas_con_tiempos
+GROUP BY id_profesional</pre>
+
+                                <p style="margin-top: 10px;"><strong>E) Agregaciones por Especialidad:</strong></p>
+                                <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto;">
+SELECT 
+    id_especialidad,
+    COUNT(*) as total_citas,
+    AVG(tiempo_espera_minutos) as tiempo_espera_promedio,
+    AVG(tiempo_atencion_minutos) as tiempo_atencion_promedio
+FROM citas_con_tiempos
+GROUP BY id_especialidad</pre>
+
+                                <p style="margin-top: 15px;"><strong>F) Limpieza de datos:</strong></p>
+                                <ul>
+                                    <li>Eliminar outliers (tiempos de espera negativos por errores de registro)</li>
+<li>Manejar valores NULL (citas sin arribo registrado)</li>
+<li>Validar coherencia de timestamps</li>
+</ul>
+</div> <div class="box" style="margin-top: 15px;">
+                            <h4>3️⃣ LOAD (Carga)</h4>
+                            <p><strong>Destino:</strong> Tabla ESTADISTICA_MENSUAL</p>
+                            <p><strong>Proceso de carga:</strong></p>
+                            <ul>
+                                <li>Insertar un registro por cada dimensión analizada:
+                                    <ul>
+                                        <li>Estadísticas globales del mes (sin FK específicas)</li>
+                                        <li>Estadísticas por box (id_box + mes/año)</li>
+                                        <li>Estadísticas por profesional (id_profesional + mes/año)</li>
+                                        <li>Estadísticas por especialidad (id_especialidad + mes/año)</li>
+                                    </ul>
+                                </li>
+                                <li>Verificar que no existan registros duplicados para el mismo período</li>
+                                <li>Si ya existen, hacer UPDATE en lugar de INSERT (re-proceso)</li>
+                            </ul>
+
+                            <p style="margin-top: 10px;"><strong>Ejemplo de INSERT:</strong></p>
+                            <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto;">  INSERT INTO ESTADISTICA_MENSUAL (
+mes, anio, id_box,
+total_citas, citas_atendidas, citas_no_asistio,
+tiempo_espera_promedio_minutos, tiempo_atencion_promedio_minutos,
+tasa_ausentismo_porcentaje
+) VALUES (
+11, 2024, 5,
+120, 108, 12,
+18.5, 25.3,
+10.0
+)</pre>
+</div> <div class="box" style="margin-top: 15px;">
+                            <h4>4️⃣ RETROALIMENTACIÓN AL SISTEMA</h4>
+                            <p><strong>Uso de las estadísticas:</strong></p>
+                            <ul>
+                                <li><strong>Optimizar agenda del mes siguiente:</strong>
+                                    <ul>
+                                        <li>Si tiempo_atencion_promedio > duración_programada → Aumentar duración de slots</li>
+                                        <li>Si tasa_ausentismo alta → Implementar overbooking controlado</li>
+                                        <li>Si tiempo_espera alto en ciertos boxes → Redistribuir profesionales</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Alertas gerenciales:</strong>
+                                    <ul>
+                                        <li>Profesionales con tiempos de atención muy altos/bajos</li>
+                                        <li>Boxes con mayor tiempo de espera</li>
+                                        <li>Especialidades con mayor demanda insatisfecha</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Reportes de desempeño:</strong>
+                                    <ul>
+                                        <li>Dashboard ejecutivo con KPIs mensuales</li>
+                                        <li>Comparativas mes a mes</li>
+                                        <li>Gráficos de tendencias</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="highlight" style="margin-top: 15px;">
+                            <h4>⏰ Programación del ETL</h4>
+                            <p><strong>Frecuencia:</strong> Mensual (primer día del mes siguiente)</p>
+                            <p><strong>Horario:</strong> Madrugada (03:00 AM) para no afectar operación</p>
+                            <p><strong>Duración estimada:</strong> 10-30 minutos dependiendo del volumen</p>
+                            <p><strong>Monitoreo:</strong> Notificación por email al completar o si falla</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- PREGUNTA 3 DE PEP 2 -->
+            <div class="pep-section" style="margin-top: 40px;">
+                <h3>📚 PREGUNTA 3: Conceptos Teóricos (20%)</h3>
+                
+                <div class="solucion">
+                    <h4>✅ a) 3 Tipos de Sistemas de Información según Nivel Decisional</h4>
+
+                    <div class="grid-3" style="margin-top: 15px;">
+                        <div class="box" style="border-top: 4px solid #27ae60;">
+                            <h4>1️⃣ NIVEL OPERACIONAL</h4>
+                            <p><strong>Sistema: TPS (Transaction Processing System)</strong></p>
+                            <p style="margin-top: 10px;"><strong>Definición:</strong> Sistemas que procesan transacciones diarias de la organización. Soportan operaciones rutinarias y repetitivas.</p>
+                            <p style="margin-top: 10px;"><strong>Ejemplo:</strong> Sistema de Punto de Venta (POS) en un supermercado</p>
+                            <p style="margin-top: 10px;"><strong>Justificación:</strong></p>
+                            <ul>
+                                <li>✅ Procesa transacciones de venta en tiempo real</li>
+                                <li>✅ Registra cada producto vendido</li>
+                                <li>✅ Actualiza inventario automáticamente</li>
+                                <li>✅ Genera boleta/factura</li>
+                                <li>✅ Alto volumen de transacciones diarias</li>
+                                <li>✅ Datos estructurados y precisos</li>
+                                <li>✅ Usuarios: cajeros, vendedores</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-top: 4px solid #f39c12;">
+                            <h4>2️⃣ NIVEL TÁCTICO</h4>
+                            <p><strong>Sistema: MIS (Management Information System)</strong></p>
+                            <p style="margin-top: 10px;"><strong>Definición:</strong> Sistemas que generan reportes periódicos para apoyo a la gestión y control. Resumen datos de los TPS.</p>
+                            <p style="margin-top: 10px;"><strong>Ejemplo:</strong> Sistema de Reportes de Ventas Mensuales</p>
+                            <p style="margin-top: 10px;"><strong>Justificación:</strong></p>
+                            <ul>
+                                <li>✅ Consolida ventas del mes por categoría</li>
+                                <li>✅ Compara con presupuesto y meses anteriores</li>
+                                <li>✅ Identifica productos más/menos vendidos</li>
+                                <li>✅ Analiza tendencias de consumo</li>
+                                <li>✅ Genera alertas de stock bajo</li>
+                                <li>✅ Usuarios: jefes de área, gerentes de tienda</li>
+                                <li>✅ Periodicidad: diaria, semanal, mensual</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-top: 4px solid #e74c3c;">
+                            <h4>3️⃣ NIVEL ESTRATÉGICO</h4>
+                            <p><strong>Sistema: EIS (Executive Information System)</strong></p>
+                            <p style="margin-top: 10px;"><strong>Definición:</strong> Sistemas que proveen información estratégica muy agregada para la alta gerencia. Soportan decisiones no estructuradas.</p>
+                            <p style="margin-top: 10px;"><strong>Ejemplo:</strong> Dashboard Ejecutivo de Retail con KPIs Estratégicos</p>
+                            <p style="margin-top: 10px;"><strong>Justificación:</strong></p>
+                            <ul>
+                                <li>✅ Muestra ventas totales vs objetivo anual</li>
+                                <li>✅ Compara con competencia (market share)</li>
+                                <li>✅ Analiza rentabilidad por línea de negocio</li>
+                                <li>✅ Proyecta crecimiento trimestral</li>
+                                <li>✅ Drill-down: desde total país hasta tienda específica</li>
+                                <li>✅ Información externa: tendencias de mercado, economía</li>
+                                <li>✅ Usuarios: CEO, directorio, VP</li>
+                                <li>✅ Visualización gráfica e intuitiva</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 30px;">✅ b) Atributos de Proceso de Negocio vs Proceso Mecánico</h4>
+
+                    <div class="important">
+                        <h4>📋 3 Atributos de un Proceso de Negocio</h4>
+                        
+                        <div class="box" style="margin-top: 15px;">
+                            <h4>1️⃣ ORIENTADO AL CLIENTE (Genera Valor)</h4>
+                            <p>El proceso debe crear un resultado valioso para un cliente (interno o externo). Tiene un propósito claro de satisfacer una necesidad.</p>
+                        </div>
+
+                        <div class="box" style="margin-top: 15px;">
+                            <h4>2️⃣ INTERFUNCIONAL (Cross-Funcional)</h4>
+                            <p>Atraviesa diferentes áreas, departamentos o funciones de la organización. Requiere coordinación entre múltiples roles.</p>
+                        </div>
+
+                        <div class="box" style="margin-top: 15px;">
+                            <h4>3️⃣ ENTRADA-TRANSFORMACIÓN-SALIDA Definidas</h4>
+                            <p>Tiene inputs claros, realiza una transformación mediante actividades específicas, y genera outputs concretos.</p>
+                        </div>
+                    </div>
+
+                    <table class="tabla-comparativa" style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Atributo</th>
+                                <th>Proceso de Negocio</th>
+                                <th>Proceso Mecánico</th>
+                                <th>¿Aplica a Ambos?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Orientado al Cliente</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Proceso de venta genera valor directo al cliente</td>
+                                <td>⚠️ INDIRECTO<br>Ejemplo: Proceso de enfriamiento en motor genera valor indirecto (evita falla)</td>
+                                <td><span style="color: #f39c12;">⚠️ Parcialmente</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Interfuncional</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Orden de compra involucra: solicitante, compras, finanzas, recepción</td>
+                                <td>❌ NO<br>Ejemplo: Compresor de aire opera solo en su circuito cerrado</td>
+                                <td><span style="color: #e74c3c;">❌ NO</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Entrada-Transformación-Salida</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Solicitud → Evaluación crediticia → Préstamo aprobado/rechazado</td>
+                                <td>✅ SÍ<br>Ejemplo: Agua + calor → Evaporación → Vapor</td>
+                                <td><span style="color: #27ae60;">✅ SÍ</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Involucra Decisiones Humanas</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Gerente aprueba o rechaza solicitud según criterios</td>
+                                <td>❌ NO<br>Ejemplo: Termostato actúa automáticamente por temperatura</td>
+                                <td><span style="color: #e74c3c;">❌ NO</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Requiere Coordinación</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Producción coordina con ventas, compras y logística</td>
+                                <td>❌ NO<br>Ejemplo: Pistones operan en secuencia pre-programada</td>
+                                <td><span style="color: #e74c3c;">❌ NO</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>6. Puede Tener Excepciones</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Cliente VIP recibe trato especial</td>
+                                <td>❌ NO<br>Ejemplo: Válvula abre/cierra según presión sin excepciones</td>
+                                <td><span style="color: #e74c3c;">❌ NO</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>7. Puede Optimizarse</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Rediseñar flujo para reducir tiempos</td>
+                                <td>✅ SÍ<br>Ejemplo: Ajustar parámetros para mayor eficiencia</td>
+                                <td><span style="color: #27ae60;">✅ SÍ</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>8. Tiene Variabilidad</strong></td>
+                                <td>✅ SÍ<br>Ejemplo: Cada cliente tiene necesidades diferentes</td>
+                                <td>❌ NO<br>Ejemplo: Proceso químico sigue misma reacción siempre</td>
+                                <td><span style="color: #e74c3c;">❌ NO</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlight" style="margin-top: 20px;">
+                        <h4>🎯 Conclusión</h4>
+                        <p><strong>Similitudes:</strong> Ambos tienen estructura entrada-transformación-salida y pueden optimizarse.</p>
+                        <p style="margin-top: 10px;"><strong>Diferencias clave:</strong></p>
+                        <ul>
+                            <li>Los procesos de negocio <strong>requieren coordinación humana</strong>, los mecánicos son automáticos</li>
+                            <li>Los procesos de negocio son <strong>interfuncionales</strong>, los mecánicos son locales</li>
+                            <li>Los procesos de negocio tienen <strong>variabilidad y excepciones</strong>, los mecánicos son determinísticos</li>
+<li>Los procesos de negocio <strong>involucran decisiones</strong>, los mecánicos siguen reglas físicas/químicas</li>
+</ul>
+</div>  <h4 style="margin-top: 30px;">✅ c) Atributos que Distinguen OLTP de OLAP</h4>
+
+                    <table class="tabla-comparativa">
+                        <thead>
+                            <tr>
+                                <th>Atributo</th>
+                                <th>OLTP<br>(Online Transaction Processing)</th>
+                                <th>OLAP<br>(Online Analytical Processing)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Propósito</strong></td>
+                                <td>Procesar transacciones del día a día</td>
+                                <td>Análisis de datos y soporte a decisiones</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Tipo de Operaciones</strong></td>
+                                <td><strong>INSERT, UPDATE, DELETE</strong><br>(Escritura intensiva)</td>
+                                <td><strong>SELECT con agregaciones</strong><br>(Lectura intensiva)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Volumen de Transacciones</strong></td>
+                                <td>Miles/millones de transacciones cortas por segundo</td>
+                                <td>Pocas consultas complejas que procesan grandes volúmenes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Tiempo de Respuesta</strong></td>
+                                <td>Milisegundos<br>(Respuesta inmediata crítica)</td>
+                                <td>Segundos a minutos<br>(Tiempo de análisis aceptable)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Tipo de Datos</strong></td>
+                                <td>Datos actuales, operacionales<br>(Lo que está pasando HOY)</td>
+                                <td>Datos históricos, consolidados<br>(Qué pasó en el PASADO)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6. Diseño de Base de Datos</strong></td>
+                                <td><strong>Normalizado (3FN)</strong><br>Evita redundancia, integridad referencial</td>
+                                <td><strong>Desnormalizado</strong><br>Esquema estrella/copo de nieve, optimizado para consultas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>7. Usuarios</strong></td>
+                                <td>Personal operativo<br>(Cajeros, vendedores, operadores)</td>
+                                <td>Analistas, gerentes, ejecutivos<br>(Quienes toman decisiones)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>8. Granularidad</strong></td>
+                                <td>Detalle fino<br>(Cada transacción individual)</td>
+                                <td>Agregado<br>(Totales, promedios, tendencias)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>9. Tamaño de BD</strong></td>
+                                <td>GB a TB<br>(Datos recientes)</td>
+                                <td>TB a PB<br>(Años de historia)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>10. Frecuencia de Actualización</strong></td>
+                                <td>Continua<br>(24/7 en tiempo real)</td>
+                                <td>Periódica<br>(ETL diario, semanal, mensual)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>11. Tipo de Consultas</strong></td>
+                                <td>Simples, predefinidas<br>SELECT * FROM ventas WHERE id=123</td>
+                                <td>Complejas, ad-hoc<br>SELECT region, SUM(ventas) FROM ventas GROUP BY region HAVING SUM(ventas) > 100000</td>
+                            </tr>
+                            <tr>
+                                <td><strong>12. Consistencia</strong></td>
+                                <td>Crítica (ACID)<br>Atomicidad, Consistencia, Aislamiento, Durabilidad</td>
+                                <td>Menos crítica<br>Puede haber pequeñas inconsistencias temporales</td>
+                            </tr>
+                            <tr>
+                                <td><strong>13. Ejemplos</strong></td>
+                                <td>
+                                    • Sistema POS<br>
+                                    • Cajeros automáticos<br>
+                                    • Sistema de reservas<br>
+                                    • ERP transaccional
+                                </td>
+                                <td>
+                                    • Data Warehouse<br>
+                                    • Business Intelligence<br>
+                                    • Reportes ejecutivos<br>
+                                    • Cubo OLAP
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="importante" style="margin-top: 20px; background: #e8f5e9; padding: 20px; border-left: 4px solid #27ae60; border-radius: 5px;">
+                        <h4>💡 Ejemplo Práctico Comparativo</h4>
+                        <p><strong>Escenario:</strong> Retail con supermercados</p>
+                        
+                        <p style="margin-top: 15px;"><strong>OLTP - Sistema de Punto de Venta:</strong></p>
+                        <ul>
+                            <li>🛒 Cajero escanea productos → Registra venta → Actualiza stock → Imprime boleta</li>
+                            <li>⏱️ Debe responder en milisegundos</li>
+                            <li>💾 Guarda cada producto vendido con todos sus detalles</li>
+                            <li>🔄 Opera 24/7 sin parar</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>OLAP - Sistema de Análisis de Ventas:</strong></p>
+                        <ul>
+                            <li>📊 Gerente consulta: "¿Cuáles fueron las ventas por categoría en el último trimestre?"</li>
+                            <li>⏱️ Puede tomar 30 segundos en procesar</li>
+                            <li>💾 Lee millones de registros históricos del Data Warehouse</li>
+                            <li>📈 Agrupa, suma, promedia y presenta en gráficos</li>
+                            <li>🔍 Permite drill-down: Trimestre → Mes → Semana → Día → Tienda</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </section>
