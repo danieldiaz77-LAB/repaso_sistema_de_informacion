@@ -3902,4 +3902,1709 @@ tasa_ausentismo_porcentaje
                 </div>
             </div>
 
-        </section>
+        </section>  <!-- PEP 3 - RESUELTA -->
+            <section id="pep3" class="section">
+                <h2>📝 PEP 3 - RESUELTA CON SOLUCIONES DETALLADAS</h2>
+
+                <div class="pep-section">
+                    <h3>🏬 PREGUNTA 1: Sistema de Gestión de Tienda de Departamentos (COMPLETA)</h3>
+                    
+                    <div class="solucion">
+                        <h4>📋 Enunciado</h4>
+                        <p>Una tienda de departamentos dispone de varios locales. En cada local hay varios vendedores (que también actúan como cajeros) y determinadas cajas. Proceso:</p>
+                        
+                        <div class="card">
+                            <h4>📌 Reglas de Negocio</h4>
+                            <ol>
+                                <li>Al iniciar el turno, el cajero se identifica en el sistema e informa el monto de dinero con el que abre su caja</li>
+                                <li>Durante la operación, se efectúan ventas: vendedores registran datos del cliente, productos vendidos y generan boleta</li>
+                                <li>El sistema se conecta con el SII para registrar la venta y generar la boleta</li>
+                                <li>Cada cierto tiempo, según el monto recaudado, los cajeros efectúan remesas al tesorero del local</li>
+                                <li>Para la remesa, registran la plata enviada y despachan valores en el sistema neumático</li>
+                                <li>En cada compra, el cliente puede pagar con distintos medios de pago (efectivo, TC, TD, vales, etc.)</li>
+                                <li>Al final del turno, el cajero efectúa un arqueo de las platas para cada medio de pago</li>
+                                <li>Genera un comprobante de cierre de caja para entregar los fondos al tesorero</li>
+                            </ol>
+                        </div>
+
+                        <h4 style="margin-top: 30px;">✅ SOLUCIÓN a) Diagrama de Flujo de Datos (DFD)</h4>
+
+                        <div class="card">
+                            <h4>🔵 ENTIDADES EXTERNAS</h4>
+                            <ul>
+                                <li><strong>👤 Cliente:</strong> Compra productos y paga</li>
+                                <li><strong>💼 Vendedor/Cajero:</strong> Atiende ventas, opera caja</li>
+                                <li><strong>🏦 SII (Servicio de Impuestos Internos):</strong> Valida y registra boletas</li>
+                                <li><strong>💰 Tesorero del Local:</strong> Recibe remesas y cierres de caja</li>
+                            </ul>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <h4>⚙️ PROCESOS PRINCIPALES</h4>
+                            
+                            <div class="box" style="border-left: 5px solid #e74c3c;">
+                                <h4>P1. APERTURA DE CAJA</h4>
+                                <p><strong>Entrada:</strong> Identificación del cajero, monto de apertura</p>
+                                <p><strong>Salida:</strong> Caja abierta y operativa</p>
+                                <p><strong>Almacena en:</strong> D1-Cajas, D2-Turnos</p>
+                                <p><strong>Descripción:</strong> Al iniciar el turno:
+                                    <ul>
+                                        <li>Cajero se identifica (usuario/contraseña o tarjeta)</li>
+                                        <li>Informa número de caja que operará</li>
+                                        <li>Declara monto de apertura (fondo fijo inicial)</li>
+                                        <li>Sistema registra: fecha/hora inicio, cajero, caja, monto inicial</li>
+                                        <li>Crea registro de TURNO asociado a ese cajero/caja</li>
+                                        <li>Estado de caja pasa a ABIERTA</li>
+                                    </ul>
+                                </p>
+                                <p><strong>Flujos de información:</strong></p>
+                                <ul>
+                                    <li>Vendedor/Cajero → P1: ID cajero, caja, monto apertura</li>
+                                    <li>P1 → D1-Cajas: Estado = ABIERTA</li>
+                                    <li>P1 → D2-Turnos: Registro de turno iniciado</li>
+                                </ul>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #3498db;">
+                                <h4>P2. REGISTRAR VENTA</h4>
+                                <p><strong>Entrada:</strong> Datos del cliente, productos, medios de pago</p>
+                                <p><strong>Salida:</strong> Venta registrada, boleta generada</p>
+                                <p><strong>Almacena en:</strong> D3-Ventas, D4-Detalle Ventas</p>
+                                <p><strong>Descripción:</strong> Durante la venta:
+                                    <ul>
+                                        <li>Vendedor registra datos del cliente (opcional: RUT, nombre, email)</li>
+                                        <li>Escanea/registra productos vendidos (código, cantidad, precio)</li>
+                                        <li>Sistema calcula subtotal, descuentos, IVA, total</li>
+                                        <li>Cliente indica medio(s) de pago</li>
+                                        <li>Si paga con múltiples medios, se registra el monto de cada uno</li>
+                                        <li>Sistema valida pago (autorización TC/TD si aplica)</li>
+                                        <li>Crea registro de VENTA con totales</li>
+                                        <li>Crea registros de DETALLE_VENTA por cada producto</li>
+                                    </ul>
+                                </p>
+                                <p><strong>Flujos de información:</strong></p>
+                                <ul>
+                                    <li>Cliente → P2: Productos a comprar</li>
+                                    <li>Vendedor/Cajero → P2: Datos ingresados al sistema</li>
+                                    <li>P2 → D3-Ventas: Encabezado de venta (total, cliente, fecha/hora)</li>
+                                    <li>P2 → D4-Detalle Ventas: Líneas de productos</li>
+                                </ul>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #27ae60;">
+                                <h4>P3. GENERAR BOLETA EN SII</h4>
+                                <p><strong>Entrada:</strong> Datos de la venta</p>
+                                <p><strong>Salida:</strong> Boleta electrónica autorizada y folio SII</p>
+                                <p><strong>Consulta:</strong> D3-Ventas</p>
+                                <p><strong>Actualiza:</strong> D3-Ventas</p>
+                                <p><strong>Descripción:</strong> Integración con SII:
+                                    <ul>
+                                        <li>Sistema toma datos de la venta</li>
+                                        <li>Genera formato XML de boleta electrónica</li>
+                                        <li>Envía a SII para autorización</li>
+                                        <li>SII valida y retorna folio de boleta</li>
+                                        <li>Sistema actualiza venta con folio SII</li>
+                                        <li>Imprime boleta con código de barras/QR</li>
+                                        <li>Entrega boleta al cliente</li>
+                                    </ul>
+                                </p>
+                                <p><strong>Flujos de información:</strong></p>
+                                <ul>
+                                    <li>D3-Ventas → P3: Datos de venta</li>
+                                    <li>P3 → SII: XML de boleta electrónica</li>
+                                    <li>SII → P3: Folio autorizado</li>
+                                    <li>P3 → D3-Ventas: Actualización con folio</li>
+                                    <li>P3 → Cliente: Boleta impresa</li>
+                                </ul>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #f39c12;">
+                                <h4>P4. EFECTUAR REMESA A TESORERÍA</h4>
+                                <p><strong>Entrada:</strong> Monto a remesar, detalle por medio de pago</p>
+                                <p><strong>Salida:</strong> Remesa registrada, valores enviados</p>
+                                <p><strong>Almacena en:</strong> D5-Remesas</p>
+                                <p><strong>Descripción:</strong> Cuando se acumula dinero en caja:
+                                    <ul>
+                                        <li>Cajero decide hacer remesa (por política o monto límite)</li>
+                                        <li>Cuenta el dinero a remesar por cada medio de pago:
+                                            <ul>
+                                                <li>Efectivo: billetes y monedas</li>
+                                                <li>Cheques: cantidad y monto</li>
+                                                <li>Vales: cantidad y monto</li>
+                                            </ul>
+                                        </li>
+                                        <li>Registra en sistema los montos</li>
+                                        <li>Coloca valores físicos en tubo neumático</li>
+                                        <li>Envía a tesorería mediante sistema neumático</li>
+                                        <li>Sistema registra REMESA: hora, cajero, caja, montos por medio</li>
+                                        <li>Se descuenta de los valores en poder del cajero</li>
+                                    </ul>
+                                </p>
+                                <p><strong>Flujos de información:</strong></p>
+                                <ul>
+                                    <li>Vendedor/Cajero → P4: Detalle de remesa</li>
+                                    <li>P4 → D5-Remesas: Registro de remesa</li>
+                                    <li>P4 → Tesorero: Valores físicos vía sistema neumático</li>
+                                </ul>
+                            </div>
+
+                            <div class="box" style="border-left: 5px solid #9b59b6;">
+                                <h4>P5. CIERRE DE CAJA (Arqueo)</h4>
+                                <p><strong>Entrada:</strong> Conteo físico de valores por medio de pago</p>
+                                <p><strong>Salida:</strong> Arqueo completado, comprobante de cierre</p>
+                                <p><strong>Consulta:</strong> D2-Turnos, D3-Ventas, D5-Remesas</p>
+                                <p><strong>Almacena en:</strong> D6-Cierres de Caja</p>
+                                <p><strong>Descripción:</strong> Al final del turno:
+                                    <ul>
+                                        <li>Cajero cuenta físicamente todo lo que tiene en caja</li>
+                                        <li>Separa por medio de pago:
+                                            <ul>
+                                                <li>Efectivo: total en billetes y monedas</li>
+                                                <li>Tarjetas de crédito: suma de vouchers</li>
+                                                <li>Tarjetas de débito: suma de vouchers</li>
+                                                <li>Cheques: cantidad y monto total</li>
+                                                <li>Vales: cantidad y monto total</li>
+                                            </ul>
+                                        </li>
+                                        <li>Registra en sistema los montos contados</li>
+                                        <li>Sistema calcula MONTO ESPERADO:
+                                            <ul>
+                                                <li>Apertura + Ventas - Remesas</li>
+                                            </ul>
+                                        </li>
+                                        <li>Sistema compara CONTADO vs ESPERADO</li>
+                                        <li>Calcula DIFERENCIA (puede ser positiva o negativa)</li>
+                                        <li>Si diferencia > tolerancia → Alerta de descuadre</li>
+                                        <li>Genera COMPROBANTE DE CIERRE con:
+                                            <ul>
+                                                <li>Resumen de ventas del turno</li>
+                                                <li>Remesas efectuadas</li>
+                                                <li>Detalle de arqueo por medio de pago</li>
+                                                <li>Diferencias detectadas</li>
+                                            </ul>
+                                        </li>
+                                        <li>Cajero imprime comprobante</li>
+                                        <li>Entrega fondos y comprobante al tesorero</li>
+                                        <li>Estado de caja pasa a CERRADA</li>
+                                    </ul>
+                                </p>
+                                <p><strong>Flujos de información:</strong></p>
+                                <ul>
+                                    <li>Vendedor/Cajero → P5: Arqueo físico (conteo real)</li>
+                                    <li>D2-Turnos → P5: Datos de apertura</li>
+                                    <li>D3-Ventas → P5: Ventas del turno</li>
+                                    <li>D5-Remesas → P5: Remesas efectuadas</li>
+                                    <li>P5 → D6-Cierres: Registro de cierre con diferencias</li>
+                                    <li>P5 → Vendedor/Cajero: Comprobante impreso</li>
+                                    <li>P5 → Tesorero: Comprobante y fondos físicos</li>
+                                    <li>P5 → D1-Cajas: Estado = CERRADA</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-top: 20px;">
+                            <h4>💾 REPOSITORIOS</h4>
+                            <ul>
+                                <li><strong>D1-Cajas:</strong> Cajas disponibles en cada local (número, ubicación, estado: ABIERTA/CERRADA)</li>
+                                <li><strong>D2-Turnos:</strong> Turnos de trabajo (cajero, caja, fecha/hora inicio, monto apertura, estado)</li>
+                                <li><strong>D3-Ventas:</strong> Encabezado de ventas (ID venta, fecha/hora, cliente, total, folio SII, cajero, caja)</li>
+                                <li><strong>D4-Detalle Ventas:</strong> Productos vendidos (ID venta, producto, cantidad, precio, subtotal)</li>
+                                <li><strong>D5-Remesas:</strong> Remesas a tesorería (ID remesa, turno, fecha/hora, montos por medio de pago)</li>
+                                <li><strong>D6-Cierres de Caja:</strong> Arqueos de cierre (ID cierre, turno, montos esperados, montos contados, diferencias por medio de pago)</li>
+                            </ul>
+                        </div>
+
+                        <h4 style="margin-top: 30px;">✅ Descripción Detallada de Procesos y Repositorios</h4>
+                        <p><em>(Ya descritos en detalle arriba en cada proceso)</em></p>
+
+                        <h4 style="margin-top: 30px;">✅ SOLUCIÓN b) Transacción de Venta (ACID)</h4>
+
+                        <div class="important">
+                            <h4>🔒 Propiedades ACID de una Transacción</h4>
+                            <ul>
+                                <li><strong>A - Atomicity (Atomicidad):</strong> Todo o nada, no estados intermedios</li>
+                                <li><strong>C - Consistency (Consistencia):</strong> La BD pasa de un estado válido a otro estado válido</li>
+                                <li><strong>I - Isolation (Aislamiento):</strong> Las transacciones concurrentes no se afectan entre sí</li>
+                                <li><strong>D - Durability (Durabilidad):</strong> Una vez confirmada, los cambios son permanentes</li>
+                            </ul>
+                        </div>
+
+                        <div class="diagrama" style="margin-top: 20px;">
+                            <h4>🔄 Flujo de la Transacción de Venta</h4>
+                            <div style="text-align: left; max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px;">
+                                
+                                <div style="background: #e8f5e9; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>🟢 BEGIN TRANSACTION</strong></p>
+                                    <p style="margin-left: 20px; color: #666;">Inicio de la transacción de venta</p>
+                                </div>
+
+                                <div style="background: #fff3e0; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>1️⃣ Validar Stock de Productos</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+SELECT stock_disponible 
+FROM productos 
+WHERE id_producto = ? 
+FOR UPDATE;  -- Lock pesimista
+
+IF stock_disponible < cantidad_solicitada THEN
+    ROLLBACK;
+    RETURN "Stock insuficiente";
+END IF;</pre>
+                                    <p style="margin-top: 10px;"><strong>ACID aplicado:</strong></p>
+                                    <ul>
+                                        <li><strong>Isolation:</strong> FOR UPDATE bloquea el registro para evitar ventas simultáneas del mismo producto</li>
+                                    </ul>
+                                </div>
+
+                                <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>2️⃣ Crear Encabezado de Venta</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+INSERT INTO ventas (
+    fecha_hora, 
+    id_cliente, 
+    id_cajero, 
+    id_caja,
+    subtotal, 
+    iva, 
+    total, 
+    estado
+) VALUES (
+    NOW(), 
+    ?, 
+    ?, 
+    ?,
+    ?, 
+    ?, 
+    ?, 
+    'PENDIENTE'
+);
+
+id_venta = LAST_INSERT_ID();</pre>
+                                </div>
+
+                                <div style="background: #f3e5f5; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>3️⃣ Insertar Detalle de Venta</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+FOR EACH producto IN carrito DO
+    INSERT INTO detalle_ventas (
+        id_venta,
+        id_producto,
+        cantidad,
+        precio_unitario,
+        subtotal
+    ) VALUES (
+        id_venta,
+        producto.id,
+        producto.cantidad,
+        producto.precio,
+        producto.cantidad * producto.precio
+    );
+END FOR;</pre>
+                                </div>
+
+                                <div style="background: #fce4ec; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>4️⃣ Actualizar Stock (Descontar)</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+FOR EACH producto IN carrito DO
+    UPDATE productos 
+    SET stock_disponible = stock_disponible - producto.cantidad
+    WHERE id_producto = producto.id;
+    
+    -- Verificar que no quedó negativo (doble validación)
+    IF stock_disponible < 0 THEN
+        ROLLBACK;
+        RETURN "Error en stock";
+    END IF;
+END FOR;</pre>
+                                    <p style="margin-top: 10px;"><strong>ACID aplicado:</strong></p>
+                                    <ul>
+                                        <li><strong>Consistency:</strong> Stock nunca queda negativo</li>
+                                        <li><strong>Atomicity:</strong> Si falla, se revierten TODOS los descuentos</li>
+                                    </ul>
+                                </div>
+
+                                <div style="background: #fff9c4; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>5️⃣ Registrar Medios de Pago</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+FOR EACH medio_pago IN medios_utilizados DO
+    INSERT INTO pagos_venta (
+        id_venta,
+        tipo_pago,  -- 'EFECTIVO', 'TC', 'TD', 'VALE'
+        monto,
+        autorizacion  -- Solo para TC/TD
+    ) VALUES (
+        id_venta,
+        medio_pago.tipo,
+        medio_pago.monto,
+        medio_pago.autorizacion
+    );
+END FOR;
+
+-- Verificar que suma de pagos = total venta
+total_pagos = SUM(monto FROM pagos_venta WHERE id_venta = id_venta);
+
+IF total_pagos != total_venta THEN
+    ROLLBACK;
+    RETURN "Error: Pagos no cuadran con total";
+END IF;</pre>
+                                    <p style="margin-top: 10px;"><strong>ACID aplicado:</strong></p>
+                                    <ul>
+                                        <li><strong>Consistency:</strong> Suma de pagos debe igual total de venta</li>
+                                    </ul>
+                                </div>
+
+                                <div style="background: #e0f2f1; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>6️⃣ Generar Boleta en SII</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+-- Llamada a servicio externo SII
+TRY:
+    folio_sii = CALL api_sii.generar_boleta(
+        rut_empresa,
+        datos_venta,
+        detalle_productos
+    );
+    
+    UPDATE ventas 
+    SET folio_sii = folio_sii,
+        estado = 'COMPLETADA'
+    WHERE id_venta = id_venta;
+    
+CATCH error_sii:
+    -- Si falla SII, marcar para reintento pero NO hacer rollback
+    -- La venta ya ocurrió, solo falta el documento tributario
+    UPDATE ventas 
+    SET estado = 'PENDIENTE_BOLETA',
+        intentos_sii = intentos_sii + 1
+    WHERE id_venta = id_venta;
+    
+    -- Proceso batch posterior reintentará generar boleta
+END TRY;</pre>
+                                    <p style="margin-top: 10px;"><strong>⚠️ Importante:</strong> La integración con SII NO debe estar dentro del COMMIT/ROLLBACK principal, ya que es un sistema externo. Si falla, se marca para reintento posterior.</p>
+                                </div>
+
+                                <div style="background: #c8e6c9; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>7️⃣ Actualizar Estadísticas de Caja</strong></p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+-- Sumar venta al turno actual del cajero
+UPDATE turnos
+SET total_ventas = total_ventas + venta.total,
+    cantidad_transacciones = cantidad_transacciones + 1
+WHERE id_turno = turno_actual
+  AND id_cajero = cajero_actual;</pre>
+                                </div>
+
+                                <div style="background: #a5d6a7; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>🟢 COMMIT TRANSACTION</strong></p>
+                                    <p style="margin-left: 20px; color: #666;">Si TODO salió bien, confirmar cambios permanentes</p>
+                                    <p style="margin-top: 10px;"><strong>ACID aplicado:</strong></p>
+                                    <ul>
+                                        <li><strong>Atomicity:</strong> Todos los pasos se completaron, COMMIT hace permanentes todos los cambios</li>
+                                        <li><strong>Durability:</strong> Los cambios quedan grabados en disco, sobreviven caídas del sistema</li>
+                                    </ul>
+                                </div>
+
+                                <div style="background: #ffcdd2; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                                    <p><strong>🔴 ROLLBACK (Solo si hay error)</strong></p>
+                                    <p style="margin-left: 20px; color: #666;">Si CUALQUIER paso falla, deshacer TODOS los cambios</p>
+                                    <pre style="background: #f4f4f4; padding: 10px; border-radius: 3px; margin-top: 10px;">
+EXCEPTION:
+    ROLLBACK;
+    LOG_ERROR("Venta fallida", error_details);
+    RETURN "La venta no pudo completarse";</pre>
+                                    <p style="margin-top: 10px;"><strong>ACID aplicado:</strong></p>
+                                    <ul>
+                                        <li><strong>Atomicity:</strong> ROLLBACK deshace todo, volvemos al estado inicial</li>
+                                        <li><strong>Consistency:</strong> La BD nunca queda en estado inconsistente</li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="highlight" style="margin-top: 20px;">
+                            <h4>🎯 Resumen de Garantías ACID en la Transacción de Venta</h4>
+                            <table class="tabla-comparativa" style="margin-top: 15px;">
+                                <thead>
+                                    <tr>
+                                        <th>Propiedad</th>
+                                        <th>Cómo se Garantiza en la Venta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Atomicity</strong></td>
+                                        <td>Si falla CUALQUIER paso (validación stock, pago, actualización), se hace ROLLBACK de TODO. O se completa toda la venta o no se completa nada.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Consistency</strong></td>
+                                        <td>
+                                            • Stock nunca queda negativo<br>
+                                            • Suma de pagos = Total venta<br>
+                                            • Cada venta tiene su detalle completo<br>
+                                            • Referencias entre tablas son válidas (FK)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Isolation</strong></td>
+                                        <td>
+                                            • FOR UPDATE bloquea productos durante la venta<br>
+                                            • Dos cajeros no pueden vender el último producto simultáneamente<br>
+                                            • Nivel de aislamiento: READ COMMITTED o superior
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Durability</strong></td>
+                                        <td>
+                                            • COMMIT escribe cambios en disco<br>
+                                            • Si hay corte de luz después del COMMIT, la venta persiste<br>
+                                            • Write-Ahead Logging (WAL) garantiza recuperación<br>
+                                            • Respaldos periódicos para desastres mayores
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- PREGUNTA 2 DE PEP 3 -->
+                <div class="pep-section" style="margin-top: 40px;">
+                    <h3>💳 PREGUNTA 2: Sistema de Excedentes de Isapres (Ley Corta)</h3>
+                    
+                    <div class="solucion">
+                        <h4>📋 Enunciado</h4>
+                        <p>La ley corta de Isapres permitiría que las Isapres devuelvan los fondos cobrados en exceso a través de un "excedente" registrado en las cuentas de los afiliados. Proceso:</p>
+                        
+                        <div class="card">
+                            <h4>📌 Reglas de Negocio</h4>
+                            <ol>
+                                <li>La Isapre analiza, para cada afiliado: plan de salud contratado, factores aplicados en cada cambio de plan</li>
+                                <li>Determina excesos según tabla de factores que debieran haberse aplicado según la Suprema vs montos efectivamente cobrados</li>
+                                <li>Determina monto en exceso y abona en cuenta de excedentes, informando al afiliado</li>
+                                <li>Afiliados pueden aplicar excedentes a compra de remedios en farmacias con convenio</li>
+                                <li>En cada compra, la farmacia consulta y disminuye el saldo de excedentes</li>
+                                <li>Alternativamente, puede usar excedentes para pagar prestaciones médicas (copago)</li>
+                                <li>Al emitirse el bono, el copago puede financiarse total o parcialmente con excedentes</li>
+                                <li>Se registra: operación, monto usado, saldo de excedentes</li>
+                                <li>La Isapre tiene conocimiento en todo momento de la cuenta de excedentes de sus afiliados </li>
+                            </ol>
+                        </div> <h4 style="margin-top: 30px;">✅ SOLUCIÓN: Diagrama de Flujo de Datos (DFD)</h4>
+
+                    <div class="card">
+                        <h4>🔵 ENTIDADES EXTERNAS</h4>
+                        <ul>
+                            <li><strong>👤 Afiliado:</strong> Recibe excedentes, consulta saldo, usa excedentes</li>
+                            <li><strong>💊 Farmacia:</strong> Valida y descuenta excedentes en compra de remedios</li>
+                            <li><strong>🏥 Centro Médico:</strong> Valida y descuenta excedentes en copago de bonos</li>
+                            <li><strong>⚖️ Superintendencia de Salud:</strong> Proporciona tabla de factores correctos</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="margin-top: 20px;">
+                        <h4>⚙️ PROCESOS PRINCIPALES</h4>
+                        
+                        <div class="box" style="border-left: 5px solid #e74c3c;">
+                            <h4>P1. CALCULAR EXCEDENTES POR AFILIADO</h4>
+                            <p><strong>Entrada:</strong> Historial de planes del afiliado, tabla de factores correctos</p>
+                            <p><strong>Salida:</strong> Monto de excedente determinado</p>
+                            <p><strong>Consulta:</strong> D1-Afiliados, D2-Historial Planes, D3-Tabla Factores Correctos</p>
+                            <p><strong>Descripción:</strong> Proceso batch que analiza historial:
+                                <ul>
+                                    <li>Para cada afiliado:
+                                        <ul>
+                                            <li>Recupera historial de planes contratados (fechas, factores aplicados)</li>
+                                            <li>Consulta tabla de factores correctos según edad/sexo en cada período</li>
+                                            <li>Calcula monto que debió cobrarse vs monto efectivamente cobrado</li>
+                                            <li>Determina diferencia (exceso cobrado)</li>
+                                            <li>Suma todos los períodos → Total excedente</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <strong>Fórmula:</strong>
+                                <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin-top: 10px;"> Excedente = Σ (Monto_Cobrado - Monto_Correcto)
+para cada período donde Monto_Cobrado > Monto_Correcto</pre>
+</p>
+<p><strong>Flujos de información:</strong></p>
+<ul>
+<li>D1-Afiliados → P1: Lista de afiliados</li>
+<li>D2-Historial Planes → P1: Planes contratados por afiliado</li>
+<li>Superintendencia → D3-Tabla Factores: Factores correctos oficiales</li>
+<li>D3-Tabla Factores → P1: Factores para comparación</li>
+</ul>
+</div> <div class="box" style="border-left: 5px solid #3498db;">
+                            <h4>P2. ABONAR EXCEDENTE Y NOTIFICAR AFILIADO</h4>
+                            <p><strong>Entrada:</strong> Excedente calculado</p>
+                            <p><strong>Salida:</strong> Cuenta de excedentes creada, afiliado notificado</p>
+                            <p><strong>Almacena en:</strong> D4-Cuenta Excedentes</p>
+                            <p><strong>Descripción:</strong>
+                                <ul>
+                                    <li>Crea/actualiza cuenta de excedentes del afiliado</li>
+                                    <li>Registra:
+                                        <ul>
+                                            <li>ID afiliado</li>
+                                            <li>Saldo inicial de excedentes</li>
+                                            <li>Fecha de abono</li>
+                                            <li>Detalle del cálculo (opcional)</li>
+                                        </ul>
+                                    </li>
+                                    <li>Genera notificación al afiliado:
+                                        <ul>
+                                            <li>Email explicando el excedente</li>
+                                            <li>Monto disponible</li>
+                                            <li>Cómo puede usarlo</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </p>
+                            <p><strong>Flujos de información:</strong></p>
+                            <ul>
+                                <li>P1 → P2: Excedente calculado</li>
+                                <li>P2 → D4-Cuenta Excedentes: Registro de saldo inicial</li>
+                                <li>P2 → Afiliado: Notificación (email/carta)</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #27ae60;">
+                            <h4>P3. CONSULTAR SALDO DE EXCEDENTES</h4>
+                            <p><strong>Entrada:</strong> Solicitud de consulta (ID afiliado)</p>
+                            <p><strong>Salida:</strong> Saldo actual de excedentes</p>
+                            <p><strong>Consulta:</strong> D4-Cuenta Excedentes</p>
+                            <p><strong>Descripción:</strong>
+                                <ul>
+                                    <li>Afiliado puede consultar en cualquier momento</li>
+                                    <li>Canales: app móvil, portal web, sucursal, call center</li>
+                                    <li>Sistema retorna:
+                                        <ul>
+                                            <li>Saldo actual disponible</li>
+                                            <li>Historial de uso</li>
+                                            <li>Fechas y montos de movimientos</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </p>
+                            <p><strong>Flujos de información:</strong></p>
+                            <ul>
+                                <li>Afiliado → P3: Solicitud de consulta</li>
+                                <li>D4-Cuenta Excedentes → P3: Saldo y movimientos</li>
+                                <li>P3 → Afiliado: Información de saldo</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #f39c12;">
+                            <h4>P4. USAR EXCEDENTES EN FARMACIA</h4>
+                            <p><strong>Entrada:</strong> Compra de remedios, uso de excedentes</p>
+                            <p><strong>Salida:</strong> Excedente descontado, compra autorizada</p>
+                            <p><strong>Actualiza:</strong> D4-Cuenta Excedentes, D5-Movimientos</p>
+                            <p><strong>Descripción:</strong> Flujo transaccional:
+                                <ul>
+                                    <li>Afiliado compra remedios en farmacia con convenio</li>
+                                    <li>Farmacia consulta saldo de excedentes del afiliado</li>
+                                    <li>Afiliado decide cuánto usar de sus excedentes</li>
+                                    <li>Sistema valida:
+                                        <ul>
+                                            <li>Afiliado tiene saldo suficiente</li>
+                                            <li>Monto no excede total de compra</li>
+                                        </ul>
+                                    </li>
+                                    <li>Sistema descuenta excedente usado</li>
+                                    <li>Registra movimiento:
+                                        <ul>
+                                            <li>Fecha/hora</li>
+                                            <li>Tipo: "COMPRA_FARMACIA"</li>
+                                            <li>Farmacia</li>
+                                            <li>Monto usado</li>
+                                            <li>Saldo restante</li>
+                                        </ul>
+                                    </li>
+                                    <li>Farmacia cobra diferencia al afiliado (si la hay)</li>
+                                </ul>
+                            </p>
+                            <p><strong>Flujos de información:</strong></p>
+                            <ul>
+                                <li>Farmacia → P4: Solicitud de uso de excedentes (ID afiliado, monto)</li>
+                                <li>D4-Cuenta Excedentes → P4: Saldo actual</li>
+                                <li>P4 → D4-Cuenta Excedentes: Actualización de saldo (descuento)</li>
+                                <li>P4 → D5-Movimientos: Registro de transacción</li>
+                                <li>P4 → Farmacia: Autorización de uso</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #9b59b6;">
+                            <h4>P5. USAR EXCEDENTES EN COPAGO MÉDICO</h4>
+                            <p><strong>Entrada:</strong> Emisión de bono médico, copago a cubrir</p>
+                            <p><strong>Salida:</strong> Excedente descontado, copago cubierto</p>
+                            <p><strong>Actualiza:</strong> D4-Cuenta Excedentes, D5-Movimientos</p>
+                            <p><strong>Descripción:</strong>
+                                <ul>
+                                    <li>Al emitir bono de atención médica, se calcula copago</li>
+                                    <li>Sistema consulta si afiliado tiene excedentes</li>
+                                    <li>Afiliado puede optar por usar excedentes para copago</li>
+                                    <li>Puede ser uso:
+                                        <ul>
+                                            <li><strong>Total:</strong> Excedentes cubren 100% del copago</li>
+                                            <li><strong>Parcial:</strong> Excedentes cubren parte, afiliado paga diferencia</li>
+                                        </ul>
+                                    </li>
+                                    <li>Sistema valida saldo y descuenta</li>
+                                    <li>Registra movimiento con detalle de prestación</li>
+                                    <li>Bono queda marcado como pagado (total o parcialmente con excedentes)</li>
+                                </ul>
+                            </p>
+                            <p><strong>Flujos de información:</strong></p>
+                            <ul>
+                                <li>Centro Médico → P5: Emisión de bono (copago)</li>
+                                <li>D4-Cuenta Excedentes → P5: Saldo disponible</li>
+                                <li>P5 → D4-Cuenta Excedentes: Descuento de excedente</li>
+                                <li>P5 → D5-Movimientos: Registro de uso en prestación</li>
+                                <li>P5 → Centro Médico: Confirmación de pago</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #e67e22;">
+                            <h4>P6. GENERAR REPORTES DE CONTROL</h4>
+                            <p><strong>Entrada:</strong> Movimientos de excedentes</p>
+                            <p><strong>Salida:</strong> Reportes para la Isapre</p>
+                            <p><strong>Consulta:</strong> D4-Cuenta Excedentes, D5-Movimientos</p>
+                            <p><strong>Descripción:</strong> Genera reportes gerenciales:
+                                <ul>
+                                    <li>Total excedentes abonados</li>
+                                    <li>Total excedentes utilizados</li>
+                                    <li>Saldo pendiente por afiliado</li>
+                                    <li>Distribución de uso (farmacias vs prestaciones)</li>
+                                    <li>Afiliados con mayor uso</li>
+                                    <li>Proyecciones de gasto</li>
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 20px;">
+                        <h4>💾 REPOSITORIOS</h4>
+                        <ul>
+                            <li><strong>D1-Afiliados:</strong> Datos de afiliados (RUT, nombre, edad, sexo)</li>
+                            <li><strong>D2-Historial Planes:</strong> Planes contratados por afiliado (fechas, factores aplicados, montos cobrados)</li>
+                            <li><strong>D3-Tabla Factores Correctos:</strong> Factores oficiales según edad/sexo determinados por la Suprema</li>
+                            <li><strong>D4-Cuenta Excedentes:</strong> Saldo actual de excedentes por afiliado</li>
+                            <li><strong>D5-Movimientos:</strong> Historial de uso de excedentes (fecha, tipo, monto, saldo resultante)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREGUNTA 3 DE PEP 3 -->
+            <div class="pep-section" style="margin-top: 40px;">
+                <h3>🔄 PREGUNTA 3: Middleware</h3>
+                
+                <div class="solucion">
+                    <h4>✅ a) ¿Qué es, para qué sirve y cuándo se recomienda un Middleware?</h4>
+
+                    <div class="definicion">
+                        <strong>¿QUÉ ES MIDDLEWARE?</strong>
+                        <p style="margin-top: 10px;">Middleware es una <strong>capa de software intermedia</strong> que facilita la comunicación, integración e interoperabilidad entre aplicaciones, sistemas o componentes que de otra manera serían incompatibles o difíciles de conectar.</p>
+                        <p style="margin-top: 10px;">Actúa como un "traductor" o "puente" entre diferentes sistemas, permitiendo que se comuniquen sin que cada uno necesite conocer los detalles internos del otro.</p>
+                    </div>
+
+                    <div class="important" style="margin-top: 20px;">
+                        <h4>🎯 ¿PARA QUÉ SIRVE?</h4>
+                        <div class="grid-2" style="margin-top: 15px;">
+                            <div class="box">
+                                <h4>1️⃣ Integración de Sistemas</h4>
+                                <p>Conecta sistemas heterogéneos (diferentes lenguajes, plataformas, protocolos)</p>
+                                <p style="margin-top: 10px;"><strong>Ejemplo:</strong> Sistema Java conectándose con sistema .NET</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>2️⃣ Desacoplamiento</h4>
+                                <p>Los sistemas no necesitan conocerse directamente, reduciendo dependencias</p>
+                                <p style="margin-top: 10px;"><strong>Beneficio:</strong> Cambiar un sistema sin afectar otros</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>3️⃣ Transformación de Datos</h4>
+                                <p>Convierte formatos de datos entre sistemas (XML ↔ JSON, etc.)</p>
+                                <p style="margin-top: 10px;"><strong>Ejemplo:</strong> Sistema A envía XML, Sistema B espera JSON</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>4️⃣ Enrutamiento de Mensajes</h4>
+                                <p>Dirige mensajes al sistema correcto según reglas</p>
+                                <p style="margin-top: 10px;"><strong>Ejemplo:</strong> Pedidos > $1000 → Sistema VIP</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>5️⃣ Gestión de Transacciones</h4>
+                                <p>Coordina transacciones distribuidas entre múltiples sistemas</p>
+                                <p style="margin-top: 10px;"><strong>Garantía:</strong> Todas las operaciones se completan o ninguna</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>6️⃣ Monitoreo y Logging</h4>
+                                <p>Registra flujo de mensajes, detecta errores, genera métricas</p>
+                                <p style="margin-top: 10px;"><strong>Visibilidad:</strong> Trazabilidad completa de integraciones</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>7️⃣ Seguridad</h4>
+                                <p>Autenticación, autorización, cifrado de mensajes</p>
+                                <p style="margin-top: 10px;"><strong>Centralización:</strong> Políticas de seguridad en un punto</p>
+                            </div>
+
+                            <div class="box">
+                                <h4>8️⃣ Balanceo de Carga</h4>
+                                <p>Distribuye peticiones entre múltiples instancias</p>
+                                <p style="margin-top: 10px;"><strong>Escalabilidad:</strong> Alta disponibilidad</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="highlight" style="margin-top: 20px;">
+                        <h4>🔧 ¿CUÁNDO SE RECOMIENDA USAR MIDDLEWARE?</h4>
+                        
+                        <div class="box" style="margin-top: 15px; border-top: 4px solid #27ae60;">
+                            <h4>✅ SE RECOMIENDA cuando:</h4>
+                            <ul>
+                                <li><strong>Múltiples sistemas heterogéneos</strong> necesitan comunicarse</li>
+                                <li>Hay <strong>diferencias de protocolos</strong> (HTTP, SOAP, FTP, MQ, etc.)</li>
+                                <li>Requieres <strong>transformar formatos</strong> de datos entre sistemas</li>
+                                <li>Necesitas <strong>orquestar procesos</strong> que involucran varios sistemas</li>
+                                <li>Hay <strong>sistemas legacy</strong> que deben integrarse con modernos</li>
+                                <li>Requieres <strong>escalabilidad</strong> y alta disponibilidad</li>
+                                <li>Necesitas <strong>monitoreo centralizado</strong> de integraciones</li>
+                                <li>La arquitectura tiende a <strong>SOA (Service-Oriented Architecture)</strong> o <strong>Microservicios</strong></li>
+                                <li>Hay <strong>mensajería asíncrona</strong> y colas de mensajes</li>
+                                <li>Requieres <strong>reintento automático</strong> en caso de fallos</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="margin-top: 15px; border-top: 4px solid #e74c3c;">
+                            <h4>❌ NO se recomienda cuando:</h4>
+                            <ul>
+                                <li>Solo hay <strong>2 sistemas simples</strong> que se comunican directamente</li>
+                                <li>Los sistemas ya <strong>hablan el mismo protocolo</strong> y formato</li>
+                                <li>Es una aplicación <strong>monolítica</strong> sin integraciones</li>
+                                <li>El <strong>overhead</strong> del middleware supera los beneficios</li>
+                                <li><strong>Baja carga</strong> de transacciones (pocas integraciones)</li>
+                                <li>Equipo <strong>no tiene experiencia</strong> con middleware (curva de aprendizaje)</li>
+                                <li><strong>Presupuesto limitado</strong> (middleware comercial es costoso)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="ejemplo" style="margin-top: 20px;">
+                        <h4>💡 Ejemplo Práctico: E-Commerce</h4>
+                        <p><strong>Escenario:</strong> Tienda online que necesita integrar:</p>
+                        <ul>
+                            <li>🛒 Sistema de ventas (web)</li>
+                            <li>📦 Sistema de inventario (ERP legacy)</li>
+                            <li>🚚 Sistema de logística (tercerizado)</li>
+                            <li>💳 Pasarela de pagos (externa)</li>
+                            <li>📧 Sistema de marketing (email)</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>SIN Middleware:</strong></p>
+                        <ul>
+                            <li>Cada sistema debe conocer cómo hablar con los otros 4</li>
+                            <li>20 integraciones punto a punto (5 × 4)</li>
+                            <li>Si cambia un sistema, afecta a todos</li>
+                            <li>Difícil de mantener y escalar</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>CON Middleware:</strong></p>
+                        <ul>
+                            <li>Cada sistema solo habla con el middleware</li>
+                            <li>5 integraciones (una por sistema)</li>
+                            <li>Middleware se encarga de ruteo, transformación, seguridad</li>
+                            <li>Fácil agregar/quitar sistemas sin afectar otros</li>
+                        </ul>
+                    </div>
+
+                    <h4 style="margin-top: 30px;">✅ b) Modelo de Middleware: Estructura y Funcionalidad</h4>
+
+                    <div class="diagrama">
+                        <h4>🏗️ Arquitectura de un Middleware (Modelo de Procesos y Repositorios)</h4>
+                    </div>
+
+                    <div class="card" style="margin-top: 20px;">
+                        <h4>⚙️ PROCESOS DEL MIDDLEWARE</h4>
+                        
+                        <div class="box" style="border-left: 5px solid #e74c3c;">
+                            <h4>P1. RECEPCIÓN DE MENSAJES</h4>
+                            <p><strong>Función:</strong> Recibir mensajes de sistemas origen</p>
+                            <p><strong>Entrada:</strong> Mensaje en protocolo origen (HTTP, SOAP, MQ, FTP, etc.)</p>
+                            <p><strong>Salida:</strong> Mensaje normalizado</p>
+                            <p><strong>Componentes:</strong>
+                                <ul>
+                                    <li><strong>Adaptadores/Conectores:</strong> Específicos por protocolo</li>
+                                    <li><strong>Listeners:</strong> Escuchan en puertos/colas configurados</li>
+                                    <li><strong>Deserializadores:</strong> Convierten payload a formato interno</li>
+                                </ul>
+                            </p>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #3498db;">
+                            <h4>P2. VALIDACIÓN Y NORMALIZACIÓN</h4>
+                            <p><strong>Función:</strong> Validar estructura y normalizar formato</p>
+                            <p><strong>Entrada:</strong> Mensaje recibido</p>
+                            <p><strong>Salida:</strong> Mensaje validado y normalizado</p>
+                            <p><strong>Actividades:</strong>
+                                <ul>
+                                    <li>Validación de esquema (XSD, JSON Schema)</li>
+                                    <li>Validación de reglas de negocio</li>
+                                    <li>Conversión a formato canónico interno</li>
+                                    <li>Enriquecimiento con datos adicionales (si necesario)</li>
+                                </ul>
+                            </p>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #27ae60;">
+                            <h4>P3. ENRUTAMIENTO</h4>
+                            <p><strong>Función:</strong> Determinar a qué sistema(s) destino enviar</p>
+                            <p><strong>Entrada:</strong> Mensaje normalizado</p>
+                            <p><strong>Salida:</strong> Ruta definida (sistema(s) destino)</p>
+                            <p><strong>Basado en:</strong>
+                                <ul>
+                                    <li><strong>Contenido:</strong> Valores en el mensaje</li>
+                                    <li><strong>Cabeceras:</strong> Metadatos del mensaje</li>
+                                    <li><strong>Reglas de negocio:</strong> Configuradas en el middleware</li>
+                                    <li><strong>Contexto:</strong> Hora, origen, prioridad</li>
+                                </ul>
+                            </p>
+                            <p style="margin-top: 10px;"><strong>Ejemplo de reglas:</strong></p>
+                            <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px;"> SI tipo_mensaje = "PEDIDO" Y monto > 1000 ENTONCES
+rutear_a = ["Sistema_VIP", "Sistema_Contabilidad"]
+SINO
+rutear_a = ["Sistema_Ventas"]
+FIN SI</pre>
+</div> <div class="box" style="border-left: 5px solid #f39c12;">
+                            <h4>P4. TRANSFORMACIÓN</h4>
+                            <p><strong>Función:</strong> Convertir mensaje al formato esperado por destino</p>
+                            <p><strong>Entrada:</strong> Mensaje normalizado + Definición de transformación</p>
+                            <p><strong>Salida:</strong> Mensaje en formato destino</p>
+                            <p><strong>Tipos de transformación:</strong>
+                                <ul>
+                                    <li><strong>Formato:</strong> XML → JSON, CSV → XML, etc.</li>
+                                    <li><strong>Estructura:</strong> Mapeo de campos (cliente.nombre → customerName)</li>
+                                    <li><strong>Valores:</strong> Conversión de códigos, fechas, monedas</li>
+                                    <li><strong>Agregación:</strong> Combinar múltiples mensajes</li>
+                                    <li><strong>Filtrado:</strong> Eliminar campos no necesarios</li>
+                                </ul>
+                            </p>
+                            <p style="margin-top: 10px;"><strong>Tecnologías:</strong> XSLT, JOLT, Groovy scripts, Mappers visuales</p>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #9b59b6;">
+                            <h4>P5. ENVÍO A DESTINO</h4>
+                            <p><strong>Función:</strong> Entregar mensaje al sistema destino</p>
+                            <p><strong>Entrada:</strong> Mensaje transformado</p>
+                            <p><strong>Salida:</strong> Confirmación de entrega</p>
+                            <p><strong>Componentes:</strong>
+                                <ul>
+                                    <li><strong>Adaptadores de salida:</strong> Por protocolo destino</li>
+                                    <li><strong>Retry Logic:</strong> Reintento automático si falla</li>
+                                    <li><strong>Circuit Breaker:</strong> Evita saturar sistemas caídos</li>
+                                    <li><strong>Timeout Management:</strong> Control de tiempos de espera</li>
+                                </ul>
+                            </p>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #e67e22;">
+                            <h4>P6. GESTIÓN DE ERRORES</h4>
+                            <p><strong>Función:</strong> Manejar fallos en cualquier etapa</p>
+                            <p><strong>Estrategias:</strong>
+                                <ul>
+                                    <li><strong>Retry:</strong> Reintentar N veces con delay</li>
+                                    <li><strong>Dead Letter Queue:</strong> Mover a cola de errores para análisis</li>
+                                    <li><strong>Compensación:</strong> Deshacer operaciones parciales</li>
+                                    <li><strong>Alertas:</strong> Notificar a equipo de operaciones</li>
+                                    <li><strong>Fallback:</strong> Ruta alternativa si sistema no disponible</li>
+                                </ul>
+                            </p>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #16a085;">
+                            <h4>P7. MONITOREO Y LOGGING</h4>
+                            <p><strong>Función:</strong> Registrar y monitorear todas las operaciones</p>
+                            <p><strong>Información capturada:</strong>
+                                <ul>
+                                    <li>Timestamp de cada etapa</li>
+                                    <li>Sistema origen y destino</li>
+                                    <li>Tamaño del mensaje</li>
+                                    <li>Tiempo de procesamiento</li>
+                                    <li>Éxito o error</li>
+                                    <li>Trace ID (trazabilidad end-to-end)</li>
+                                </ul>
+                            </p>
+                            <p><strong>Dashboard:</strong> Métricas en tiempo real (throughput, latencia, errores)</p>
+                        </div>
+
+                        <div class="box" style="border-left: 5px solid #c0392b;">
+                            <h4>P8. SEGURIDAD</h4>
+                            <p><strong>Función:</strong> Garantizar seguridad de las integraciones</p>
+                            <p><strong>Mecanismos:</strong>
+                                <ul>
+                                    <li><strong>Autenticación:</strong> API Keys, OAuth, JWT , certificados</li>
+<li><strong>Autorización:</strong> Control de acceso por sistema/servicio</li>
+<li><strong>Cifrado:</strong> TLS/SSL en tránsito, cifrado en reposo</li>
+<li><strong>Firma digital:</strong> Integridad de mensajes</li>
+<li><strong>Audit Trail:</strong> Registro inmutable de operaciones</li>
+</ul>
+</p>
+</div>
+</div>  <div class="card" style="margin-top: 20px;">
+                        <h4>💾 REPOSITORIOS DEL MIDDLEWARE</h4>
+                        <ul>
+                            <li><strong>R1-Configuración de Rutas:</strong> Reglas de enrutamiento por tipo de mensaje</li>
+                            <li><strong>R2-Transformaciones:</strong> Mapeos y reglas de transformación (XSLT, scripts)</li>
+                            <li><strong>R3-Registro de Mensajes:</strong> Log de todos los mensajes procesados</li>
+                            <li><strong>R4-Cola de Entrada:</strong> Mensajes pendientes de procesar</li>
+                            <li><strong>R5-Cola de Salida:</strong> Mensajes listos para enviar</li>
+                            <li><strong>R6-Dead Letter Queue:</strong> Mensajes con error permanente</li>
+                            <li><strong>R7-Configuración de Sistemas:</strong> Endpoints, credenciales, protocolos de sistemas conectados</li>
+                            <li><strong>R8-Métricas:</strong> Estadísticas de rendimiento (throughput, latencia, errores)</li>
+                            <li><strong>R9-Audit Log:</strong> Registro de auditoría de todas las operaciones</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight" style="margin-top: 20px;">
+                        <h4>🔄 Flujo Completo a Través del Middleware</h4>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                            <p><strong>1.</strong> Sistema A envía mensaje HTTP POST → <strong>P1 (Recepción)</strong></p>
+                            <p><strong>2.</strong> Mensaje deserializado → R4 (Cola Entrada)</p>
+                            <p><strong>3.</strong> → <strong>P2 (Validación)</strong> → Validación exitosa</p>
+                            <p><strong>4.</strong> → <strong>P3 (Enrutamiento)</strong> → Consulta R1 (Reglas) → Destino: Sistema B y C</p>
+                            <p><strong>5.</strong> → <strong>P4 (Transformación)</strong> → Consulta R2 (Mapeos) → Genera 2 mensajes transformados</p>
+                            <p><strong>6.</strong> Mensajes → R5 (Cola Salida)</p>
+                            <p><strong>7.</strong> → <strong>P5 (Envío)</strong> → Consulta R7 (Config Sistemas)</p>
+                            <p style="margin-left: 20px;">├─ Envía a Sistema B vía SOAP (éxito)</p>
+                            <p style="margin-left: 20px;">└─ Envía a Sistema C vía REST (falla)</p>
+                            <p><strong>8.</strong> → <strong>P6 (Gestión Errores)</strong> → Reintenta envío a C (éxito en 2do intento)</p>
+                            <p><strong>9.</strong> → <strong>P7 (Logging)</strong> → Registra en R3 y R8</p>
+                            <p><strong>10.</strong> Fin - Mensaje procesado exitosamente</p>
+                        </div>
+                    </div>
+
+                    <div class="ejemplo" style="margin-top: 20px;">
+                        <h4>🏆 Ejemplos de Middleware en el Mercado</h4>
+                        <div class="grid-2" style="margin-top: 15px;">
+                            <div class="box">
+                                <h4>Enterprise Service Bus (ESB)</h4>
+                                <ul>
+                                    <li>MuleSoft Anypoint Platform</li>
+                                    <li>IBM Integration Bus</li>
+                                    <li>Oracle Service Bus</li>
+                                    <li>Apache ServiceMix</li>
+                                </ul>
+                            </div>
+                            <div class="box">
+                                <h4>Message Brokers</h4>
+                                <ul>
+                                    <li>Apache Kafka</li>
+                                    <li>RabbitMQ</li>
+                                    <li>IBM MQ</li>
+                                    <li>Amazon SQS</li>
+                                </ul>
+                            </div>
+                            <div class="box">
+                                <h4>API Gateways</h4>
+                                <ul>
+                                    <li>Kong</li>
+                                    <li>AWS API Gateway</li>
+                                    <li>Apigee</li>
+                                    <li>Azure API Management</li>
+                                </ul>
+                            </div>
+                            <div class="box">
+                                <h4>Integration Platforms</h4>
+                                <ul>
+                                    <li>Dell Boomi</li>
+                                    <li>Informatica</li>
+                                    <li>Talend</li>
+                                    <li>Zapier (low-code)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREGUNTA 4 DE PEP 3 -->
+            <div class="pep-section" style="margin-top: 40px;">
+                <h3>🏢 PREGUNTA 4: Front-Office vs Back-Office</h3>
+                
+                <div class="solucion">
+                    <h4>📋 Definiciones</h4>
+
+                    <div class="grid-2">
+                        <div class="box" style="border-top: 4px solid #3498db;">
+                            <h4>👥 FRONT-OFFICE</h4>
+                            <p><strong>Definición:</strong> Conjunto de procesos, sistemas y personas que interactúan <strong>directamente con el cliente</strong>. Es la "cara visible" de la organización.</p>
+                            <p style="margin-top: 10px;"><strong>Características:</strong></p>
+                            <ul>
+                                <li>Orientado al cliente</li>
+                                <li>Foco en experiencia del usuario</li>
+                                <li>Genera ingresos directos</li>
+                                <li>Alta visibilidad</li>
+                                <li>Requiere habilidades interpersonales</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Funciones típicas:</strong></p>
+                            <ul>
+                                <li>Ventas</li>
+                                <li>Atención al cliente</li>
+                                <li>Marketing</li>
+                                <li>Servicio post-venta</li>
+                                <li>Soporte técnico</li>
+                            </ul>
+                        </div>
+
+                        <div class="box" style="border-top: 4px solid #e67e22;">
+                            <h4>🏭 BACK-OFFICE</h4>
+                            <p><strong>Definición:</strong> Conjunto de procesos, sistemas y personas que <strong>no interactúan directamente con el cliente</strong>. Son las operaciones "detrás de escena" que soportan al front-office.</p>
+                            <p style="margin-top: 10px;"><strong>Características:</strong></p>
+                            <ul>
+                                <li>Orientado a operaciones internas</li>
+                                <li>Foco en eficiencia y control</li>
+                                <li>Soporta generación de ingresos</li>
+                                <li>Baja visibilidad externa</li>
+                                <li>Requiere habilidades técnicas/administrativas</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Funciones típicas:</strong></p>
+                            <ul>
+                                <li>Contabilidad y finanzas</li>
+                                <li>Recursos humanos</li>
+                                <li>IT y sistemas</li>
+                                <li>Compras y adquisiciones</li>
+                                <li>Logística y bodega</li>
+                                <li>Cumplimiento y legal</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 30px;">💼 Ejemplo Detallado: Banco</h4>
+
+                    <table class="tabla-comparativa">
+                        <thead>
+                            <tr>
+                                <th>Aspecto</th>
+                                <th>FRONT-OFFICE (Banco)</th>
+                                <th>BACK-OFFICE (Banco)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Personal</strong></td>
+                                <td>
+                                    • Ejecutivos de cuenta<br>
+                                    • Cajeros<br>
+                                    • Asesores financieros<br>
+                                    • Personal de servicio al cliente<br>
+                                    • Gerentes de sucursal
+                                </td>
+                                <td>
+                                    • Contadores<br>
+                                    • Analistas de riesgo<br>
+                                    • Desarrolladores de sistemas<br>
+                                    • Personal de HR<br>
+                                    • Auditores internos<br>
+                                    • Equipo de cumplimiento
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sistemas</strong></td>
+                                <td>
+                                    • CRM (Salesforce)<br>
+                                    • Sistema de cajas<br>
+                                    • Portal web de clientes<br>
+                                    • App móvil<br>
+                                    • Contact center<br>
+                                    • Chat en línea
+                                </td>
+                                <td>
+                                    • Core bancario<br>
+                                    • Sistema contable<br>
+                                    • Sistema de nómina<br>
+                                    • Sistema de gestión de documentos<br>
+                                    • Sistema de reportería regulatoria<br>
+                                    • Data Warehouse
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Procesos</strong></td>
+                                <td>
+                                    • Apertura de cuenta<br>
+                                    • Solicitud de crédito<br>
+                                    • Atención de reclamos<br>
+                                    • Asesoría de inversiones<br>
+                                    • Venta de productos<br>
+                                    • Retiros y depósitos
+                                </td>
+                                <td>
+                                    • Procesamiento de transacciones nocturnas<br>
+                                    • Conciliación bancaria<br>
+                                    • Análisis crediticio<br>
+                                    • Gestión de liquidez<br>
+                                    • Reportes a superintendencia<br>
+                                    • Mantenimiento de sistemas
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Horarios</strong></td>
+                                <td>
+                                    Horario de atención al público<br>
+                                    (ej: 9:00-14:00)
+                                </td>
+                                <td>
+                                    Puede ser 24/7 para procesamiento<br>
+                                    O horario administrativo regular
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Métricas</strong></td>
+                                <td>
+                                    • Satisfacción del cliente (NPS)<br>
+                                    • Tiempo de atención<br>
+                                    • Ventas por ejecutivo<br>
+                                    • Conversión de leads<br>
+                                    • Tasa de resolución en primera llamada
+                                </td>
+                                <td>
+                                    • Tiempo de procesamiento<br>
+                                    • Tasa de errores<br>
+                                    • Costo operacional<br>
+                                    • Cumplimiento regulatorio<br>
+                                    • Disponibilidad de sistemas
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ejemplo de Flujo</strong></td>
+                                <td colspan="2">
+                                    <strong>Cliente solicita crédito hipotecario:</strong><br><br>
+                                    <strong>FRONT-OFFICE:</strong><br>
+                                    1. Ejecutivo recibe al cliente en sucursal<br>
+                                    2. Ingresa solicitud en el sistema<br>
+                                    3. Explica condiciones y requisitos<br>
+                                    4. Recibe documentación del cliente<br>
+                                    5. Envía solicitud a evaluación<br><br>
+                                    
+                                    <strong>BACK-OFFICE:</strong><br>
+                                    6. Analista de riesgo evalúa crediticia<br>
+                                    7. Verifica documentación e ingresos<br>
+                                    8. Consulta bases de datos (Dicom, etc.)<br>
+                                    9. Calcula capacidad de pago<br>
+                                    10. Comité de crédito aprueba/rechaza<br>
+                                    11. Legal prepara contratos<br>
+                                    12. Operaciones configura producto<br><br>
+                                    
+                                    <strong>FRONT-OFFICE:</strong><br>
+                                    13. Ejecutivo notifica decisión al cliente<br>
+                                    14. Coordina firma de contratos<br>
+                                    15. Entrega documentación final
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="importante" style="margin-top: 20px; background: #e8f5e9; padding: 20px; border-left: 4px solid #27ae60; border-radius: 5px;">
+                        <h4>🔗 Integración Front-Office y Back-Office</h4>
+                        <p>Ambas áreas deben estar <strong>fuertemente integradas</strong> para que la empresa funcione eficientemente:</p>
+                        <ul>
+                            <li>✅ Front-office necesita información del back-office en tiempo real (ej: disponibilidad de stock, estado de pedidos)</li>
+                            <li>✅ Back-office necesita datos del front-office para operar (ej: ventas realizadas, reclamos recibidos)</li>
+                            <li>✅ La integración a través de sistemas (ERP, CRM) es fundamental</li>
+                            <li>✅ Un buen front-office sin back-office eficiente genera promesas incumplidas</li>
+                            <li>✅ Un buen back-office sin front-office efectivo no genera ventas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </section>  <!-- QUIZ FINAL -->
+            <section id="quiz" class="section">
+                <h2>❓ QUIZ FINAL - Pon a Prueba tus Conocimientos</h2>
+
+                <div class="quiz-section">
+                    <p style="font-size: 1.1em; margin-bottom: 30px;">A continuación encontrarás preguntas de selección múltiple para evaluar tu comprensión de los contenidos. <strong>Haz clic en la opción que consideres correcta.</strong></p>
+
+                    <!-- PREGUNTA 1 -->
+                    <div class="quiz-question">
+                        <h3>1. ¿Cuál es el objetivo principal de TOGAF?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Desarrollar software de forma ágil
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! TOGAF busca alinear la estrategia de negocio con las TI.')">
+                            B) Alinear la estrategia de negocio con las TI
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Gestionar proyectos de construcción
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Crear bases de datos relacionales
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 2 -->
+                    <div class="quiz-question">
+                        <h3>2. ¿Qué significa que un sistema garantice "ACID"?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Automatización, Control, Integración, Desarrollo
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! ACID = Atomicity, Consistency, Isolation, Durability')">
+                            B) Atomicidad, Consistencia, Aislamiento, Durabilidad
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Acceso, Cifrado, Integridad, Distribución
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Arquitectura, Configuración, Instalación, Documentación
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 3 -->
+                    <div class="quiz-question">
+                        <h3>3. ¿Cuál de los siguientes NO es un principio del Diseño Organizacional?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Dirigido por propósito y estrategia
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Pensamiento sistémico
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! La automatización total no es uno de los 5 principios del Diseño Organizacional.')">
+                            C) Automatización total de procesos
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Proceso continuo de negocio
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 4 -->
+                    <div class="quiz-question">
+                        <h3>4. En un sistema OLTP vs OLAP, ¿cuál característica corresponde a OLTP?</h3>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! OLTP procesa miles de transacciones cortas por segundo.')">
+                            A) Miles de transacciones cortas por segundo
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Consultas complejas con agregaciones
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Base de datos desnormalizada
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Datos históricos consolidados
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 5 -->
+                    <div class="quiz-question">
+                        <h3>5. ¿Qué sistema empresarial gestiona la relación con clientes en marketing, ventas y post-venta?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) ERP
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! CRM (Customer Relationship Management) gestiona las relaciones con clientes.')">
+                            B) CRM
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) SCM
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) KMS
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 6 -->
+                    <div class="quiz-question">
+                        <h3>6. En el Modelo Estrella de Galbraith, ¿cuáles son las 5 categorías?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Misión, Visión, Valores, Cultura, Liderazgo
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! Las 5 categorías del Modelo Estrella son: Estrategia, Estructura, Procesos, Reconocimientos y Personas.')">
+                            B) Estrategia, Estructura, Procesos, Reconocimientos, Personas
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Planificación, Organización, Dirección, Control, Evaluación
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Tecnología, Datos, Aplicaciones, Infraestructura, Seguridad
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 7 -->
+                    <div class="quiz-question">
+                        <h3>7. ¿Cuál es la función principal de un Middleware?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Crear bases de datos
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! El Middleware facilita la comunicación e integración entre sistemas heterogéneos.')">
+                            B) Facilitar comunicación e integración entre sistemas heterogéneos
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Desarrollar interfaces gráficas
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Gestionar recursos humanos
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 8 -->
+                    <div class="quiz-question">
+                        <h3>8. ¿Qué calcula el proceso MRP?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Márgenes de rentabilidad de productos
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! MRP calcula qué materiales se necesitan, cuánto y cuándo para la producción.')">
+                            B) Requerimientos de materiales para producción
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Rutas de distribución óptimas
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Presupuestos anuales
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 9 -->
+                    <div class="quiz-question">
+                        <h3>9. ¿Cuál es una desventaja típica de los sistemas ERP?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) No integran diferentes áreas
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Son muy baratos
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! Los ERP suelen tener estructura rígida difícil de adaptar a necesidades específicas.')">
+                            C) Estructura rígida difícil de personalizar
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) No soportan múltiples usuarios
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 10 -->
+                    <div class="quiz-question">
+                        <h3>10. ¿Qué caracteriza al Front-Office de una empresa?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Procesos internos sin contacto con clientes
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! El Front-Office es la cara visible que interactúa directamente con el cliente.')">
+                            B) Interacción directa con el cliente
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Gestión de recursos humanos
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Procesamiento batch nocturno
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 11 -->
+                    <div class="quiz-question">
+                        <h3>11. En el ciclo ADM de TOGAF, ¿qué fase desarrolla la arquitectura de negocio?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Fase A - Architecture Vision
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! La Fase B desarrolla la Business Architecture.')">
+                            B) Fase B - Business Architecture
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Fase C - Information Systems Architecture
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Fase D - Technology Architecture
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 12 -->
+                    <div class="quiz-question">
+                        <h3>12. ¿Cuál de estos NO es un componente fundamental de un Sistema de Información?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Personas
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Procesos
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! Los edificios no son un componente fundamental de un SI. Los componentes son: Personas, Procesos, Datos, Infraestructura tecnológica, y Procedimientos/Políticas.')">
+                            C) Edificios
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Infraestructura tecnológica
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 13 -->
+                    <div class="quiz-question">
+                        <h3>13. ¿Qué significa ETL en el contexto de Data Warehouse?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Execute, Test, Launch
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! ETL = Extract, Transform, Load')">
+                            B) Extract, Transform, Load
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Evaluate, Track, Log
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Encode, Transmit, Link
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 14 -->
+                    <div class="quiz-question">
+                        <h3>14. ¿Cuál proceso NO es parte típica de un DFD?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Procesos de transformación
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Flujos de datos
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! Los diagramas de Gantt no son parte de un DFD. Los DFD tienen: Procesos, Flujos, Almacenes y Entidades Externas.')">
+                            C) Diagramas de Gantt
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Almacenes de datos
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 15 -->
+                    <div class="quiz-question">
+                        <h3>15. ¿Qué sistema gestiona la cadena de suministro desde proveedores hasta cliente final?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) CRM
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) ERP
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! SCM (Supply Chain Management) gestiona toda la cadena productiva.')">
+                            C) SCM
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) KMS
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 16 -->
+                    <div class="quiz-question">
+                        <h3>16. ¿Qué nivel de información organizacional usa datos muy agregados?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Nivel Operacional
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Nivel Táctico
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! El Nivel Estratégico usa información muy agregada y resumida.')">
+                            C) Nivel Estratégico
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Nivel Técnico
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 17 -->
+                    <div class="quiz-question">
+                        <h3>17. En un proceso de negocio, ¿cuál característica lo distingue de un proceso mecánico?</h3>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! Los procesos de negocio requieren coordinación humana y decisiones, los mecánicos son automáticos.')">
+                            A) Requiere coordinación humana y decisiones
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Tiene entrada-proceso-salida
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Puede optimizarse
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Usa energía
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 18 -->
+                    <div class="quiz-question">
+                        <h3>18. ¿Cuál NO es una fase del ciclo ADM de TOGAF?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Architecture Vision
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) Business Architecture
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! Database Design no es una fase del ADM. Las fases son: Preliminary, A-H (Vision, Business, IS, Technology, Opportunities, Migration, Governance, Change Management).')">
+                            C) Database Design
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Migration Planning
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 19 -->
+                    <div class="quiz-question">
+                        <h3>19. ¿Qué tipo de procesamiento se ejecuta en lotes programados?</h3>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! El procesamiento Batch se ejecuta en lotes programados, típicamente de noche.')">
+                            A) Batch
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            B) En línea
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) Tiempo real
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Transaccional
+                        </div>
+                    </div>
+
+                    <!-- PREGUNTA 20 -->
+                    <div class="quiz-question">
+                        <h3>20. ¿Cuál es la principal ventaja de usar un ERP?</h3>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            A) Es gratis y fácil de implementar
+                        </div>
+                        <div class="option" onclick="this.classList.add('correct'); alert('¡Correcto! La principal ventaja de un ERP es la integración completa de procesos en tiempo real.')">
+                            B) Integración completa de procesos en tiempo real
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            C) No requiere capacitación
+                        </div>
+                        <div class="option" onclick="this.classList.add('incorrect')">
+                            D) Se puede personalizar completamente sin costo
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 40px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                        <h3>🎓 ¡Has completado el quiz!</h3>
+                        <p style="margin-top: 15px; font-size: 1.1em;">Revisa tus respuestas y repasa los temas donde tengas dudas.</p>
+                        <p style="margin-top: 10px;">¡Mucho éxito en tu PEP! 🚀</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RECURSOS ADICIONALES -->
+            <section class="section" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 40px; border-radius: 15px;">
+                <h2 style="color: white; border-bottom: 3px solid rgba(255,255,255,0.3);">📚 Recursos Adicionales</h2>
+                
+                <div class="grid-2" style="margin-top: 30px;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                        <h3 style="color: white;">🔗 Links Útiles</h3>
+                        <ul style="margin-top: 15px;">
+                            <li>TOGAF Certification: <a href="https://www.opengroup.org/certifications/togaf" style="color: #fff3cd;" target="_blank">The Open Group</a></li>
+                            <li>Lucidchart (Diagramas DFD): <a href="https://www.lucidchart.com" style="color: #fff3cd;" target="_blank">lucidchart.com</a></li>
+                            <li>Bizagi Modeler (BPMN): <a href="https://www.bizagi.com/es/productos/bpm-suite/modeler" style="color: #fff3cd;" target="_blank">bizagi.com</a></li>
+                            <li>Draw.io (Diagramas gratis): <a href="https://app.diagrams.net/" style="color: #fff3cd;" target="_blank">draw.io</a></li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                        <h3 style="color: white;">💡 Tips para el Examen</h3>
+                        <ul style="margin-top: 15px;">
+                            <li>✅ Practica hacer DFDs a mano antes del examen</li>
+                            <li>✅ Memoriza los 5 principios del Diseño Organizacional</li>
+                            <li>✅ Entiende la diferencia OLTP vs OLAP</li>
+                            <li>✅ Repasa las fases del ADM de TOGAF</li>
+                            <li>✅ Conoce ejemplos concretos de cada concepto</li>
+                            <li>✅ Practica describir procesos y repositorios</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                    <h3 style="color: white;">📖 Glosario Rápido</h3>
+                    <div class="grid-3" style="margin-top: 15px;">
+                        <div>
+                            <strong>DFD:</strong> Diagrama de Flujo de Datos<br>
+                            <strong>BPMN:</strong> Business Process Model and Notation<br>
+                            <strong>ADM:</strong> Architecture Development Method<br>
+                            <strong>BOM:</strong> Bill of Materials
+                        </div>
+                        <div>
+                            <strong>MRP:</strong> Material Requirements Planning<br>
+                            <strong>ERP:</strong> Enterprise Resource Planning<br>
+                            <strong>CRM:</strong> Customer Relationship Management<br>
+                            <strong>SCM:</strong> Supply Chain Management
+                        </div>
+                        <div>
+                            <strong>KMS:</strong> Knowledge Management System<br>
+                            <strong>ACID:</strong> Atomicity, Consistency, Isolation, Durability<br>
+                            <strong>ETL:</strong> Extract, Transform, Load<br>
+                            <strong>SI:</strong> Sistema de Información
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <footer>
+            <p>📊 <strong>Sistemas de Información - Resumen Completo 2025</strong></p>
+            <p style="margin-top: 10px;">Profesora: Valentina Tombolini Echeverría | Universidad de Santiago de Chile</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Documento creado para fines educativos | Última actualización: Diciembre 2024</p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                💡 <em>Tip:</em> Guarda este documento en tu navegador (Ctrl+D) para acceso rápido<br>
+                📱 Este documento es responsive - puedes verlo en tu celular<br>
+                🖨️ Para imprimir, usa Ctrl+P y selecciona "Guardar como PDF"
+            </p>
+            <p style="margin-top: 20px; font-size: 1.2em;">¡Mucho éxito en tu examen! 🎓✨</p>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scroll para navegación
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animación de entrada para secciones
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Efecto hover para cards
+        document.querySelectorAll('.card, .box').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            });
+        });
+
+        // Mostrar progreso de lectura
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            
+            // Crear barra de progreso si no existe
+            let progressBar = document.getElementById('progressBar');
+            if (!progressBar) {
+                progressBar = document.createElement('div');
+                progressBar.id = 'progressBar';
+                progressBar.style.cssText = 'position: fixed; top: 0; left: 0; width: 0%; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); z-index: 9999; transition: width 0.3s;';
+                document.body.appendChild(progressBar);
+            }
+            progressBar.style.width = scrolled + '%';
+        });
+
+        console.log('📚 Resumen de Sistemas de Información cargado correctamente');
+        console.log('💡 Usa Ctrl+F para buscar términos específicos');
+        console.log('🎯 ¡Mucho éxito en tu estudio!');
+    </script>
+</body>
+</html>
